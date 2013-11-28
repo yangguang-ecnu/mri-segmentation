@@ -93,7 +93,7 @@ posvar_coronal = cell(handles.s_coronal,1);
 
 %% Plot the data 
 axes(handles.axes_logo);
-imshow(imread('resources/icon/logo.png'),[]);
+imshow(imread('pictures/icon/logo.png'),[]);
 
 axes(handles.axes_axial);
 imshow(handles.views.axial(:,:,1),[]);hold on

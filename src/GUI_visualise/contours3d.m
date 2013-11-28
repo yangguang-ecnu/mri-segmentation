@@ -161,95 +161,56 @@ handles.view3d = 1;
 axes(handles.axes_3dview);
 axis on
 cla
+    
+for ax = 1:handles.s_axial
+    
+%    if min(min(handles.masks{ax})) ~= max(max(handles.masks{ax}))
 
-for ax = 1%:handles.s_axial
+        [X,Y,Z,triTexture] = axial_rcs(handles.views.axial_info{ax},handles.masks{ax});
 
+        hSurface = surf(X,Y,Z,'cdata',triTexture,...          %# Plot texture-mapped surface
+                        'FaceColor','texturemap');hold on
 
-%     %% Axial %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
-%     M = zeros(4,4);
-% 
-%     M(1:3,4) = handles.views.axial_info{ax}.ImagePositionPatient;
-%     M(4,4) = 1;
-%     M(1:3,1) = handles.views.axial_info{ax}.ImageOrientationPatient(1:3).*handles.views.axial_info{ax}.PixelSpacing(1);
-%     M(1:3,2) = handles.views.axial_info{ax}.ImageOrientationPatient(4:6).*handles.views.axial_info{ax}.PixelSpacing(2);
-% 
-%     i = [0 511];
-%     j = [0 511];
-% 
-%     x = [];
-%     y = [];
-%     z = [];
-% 
-% 
-%     for k=1:length(i)
-%         for l=1:length(j)
-%         p = M*[i(k) j(l) 0 1]';
-% 
-%             x = [x p(1)];
-%             y = [y p(2)];
-%             z = [z p(3)];
-% 
-%         end
-%     end
-% 
-%     P1 = [x(1) y(1) z(1)];
-%     P2 = [x(2) y(2) z(2)];
-%     P3 = [x(3) y(3) z(3)];
-%     P4 = [x(4) y(4) z(4)];
-% 
-%     x = [P1(1) P4(1) P2(1)];   %# [xorigin xA xB] coordinates in 3-D space
-%     y = [P1(2) P4(3) P2(2)];   %# [yorigin yA yB] coordinates in 3-D space
-%     z = [P1(3) P4(3) P2(3)];   %# [zorigin zA zB] coordinates in 3-D space
-% 
-%     origin = [512 1];  %# Vertex of triangle in image space
-%     U = [0 511];       %# Vector from origin to point A in image space
-%     V = [-511 511]; 
-%     img = handles.masks{ax};%aa;  %# Sample image for texture map
-%     
-%     A = origin+U;  %# Point A
-%     B = origin+V;  %# Point B
-%     C = B-U;     %# Point C
-% 
-%     [nRows,nCols,nPages] = size(img);  %# Image dimensions
-%     inputCorners = [origin; ...        %# Corner coordinates of input space
-%                     A; ...
-%                     B; ...
-%                     C];
-% 
-%     outputCorners = [origin; ...      %# Corner coordinates of output space
-%                      A; ...
-%                      B; ...
-%                      C];            
-% 
-%     tform = maketform('projective',...  %# Make the transformation structure
-%                       inputCorners,...
-%                       outputCorners);
-%     triTexture = imtransform(img,tform,'bicubic',...  %# Transform the image
-%                              'xdata',[1 nCols],...
-%                              'ydata',[1 nRows],...
-%                              'size',[nRows nCols]);
-%     x = [P3(1) P4(1) P2(1) P1(1)];   %# [xorigin xA xB] coordinates in 3-D space
-%     y = [P3(2) P4(2) P2(2) P1(2)];   %# [yorigin yA yB] coordinates in 3-D space
-%     z = [P3(3) P4(3) P2(3) P1(3)];   %# [zorigin zA zB] coordinates in 3-D space
-%     % index = [3 4; 2 1];  %# Index used to create 2-by-2 surface coordinates
-%     %index = [1 4;2 3];
-%     index = [4 1;3 2];
-%     X1 = x(index);      %# x coordinates of surface
-%     Y1 = y(index);       %# y coordinates of surface
-%     Z1 = z(index);        %# z coordinates of surface
+        set(hSurface,'edgecolor','none','facealpha','texture','alphadata',handles.alpha_ch{ax});
+
+        alpha('direct');
+        alphamap([.01;1]);
 
 
-    [X,Y,Z,triTexture] = axial_rcs(handles.views.axial_info{ax},handles.masks{ax});
-    hSurface = surf(X,Y,Z,'cdata',triTexture,...          %# Plot texture-mapped surface
-                    'FaceColor','texturemap');hold on
-                    
-    set(hSurface,'edgecolor','none','facealpha','texture','alphadata',handles.alpha_ch{ax});
-    alpha('direct');
-    alphamap([.1;1]);
+        X_all{ax} = X;
+        Y_all{ax} = Y;
+        Z_all{ax} = Z;
 
-    axis equal 
+        texture_all{ax} = triTexture;
+
+
+        axis equal 
+%    end
+
 end
+
+
+
+% for i = 0:1:min(min(Z_all{1}))-min(min(Z_all{2}))
+%     
+%     beta = 1 - (min(min(Z_all{1})) - (min(min(Z_all{1}))-i))/(min(min(Z_all{1})) - min(min(Z_all{2})));
+%     
+% 	zd = Z_all{1} - i
+% 	
+%     out = beta.*texture_all{1} + (1-beta).*texture_all{2};
+%     out_alpha = beta.*handles.alpha_ch{1} + (1-beta).*handles.alpha_ch{2};
+%     
+%     hsp1 = surf(X_all{1},Y_all{1},zd,'cdata',out,...          %# Plot texture-mapped surface
+%                     'FaceColor','texturemap');hold on
+%     
+%     set(hsp1,'edgecolor','none','facealpha','texture','alphadata',out_alpha);
+%     
+%     alpha('direct');
+%     alphamap([0;1]);
+% 
+% 	hold on    
+% end
+
 
 % Update handles structure
 guidata(hObject, handles);

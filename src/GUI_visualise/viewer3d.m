@@ -115,7 +115,7 @@ zoom on
 axis off
 
 axes(handles.axes_orient);
-imshow(imread('resources/icon/logo.png'),[]);
+imshow(imread('pictures/icon/logo.png'),[]);
  
 % Update handles structure
 guidata(hObject, handles);
