@@ -5,8 +5,8 @@ function [X,Y,Z,triTexture] = axial_rcs(axial_info,img)
 
     M(1:3,4) = axial_info.ImagePositionPatient;
     M(4,4) = 1;
-    M(1:3,1) = axial_info.ImageOrientationPatient(1:3).*handles.views.axial_info.PixelSpacing(1);
-    M(1:3,2) = axial_info.ImageOrientationPatient(4:6).*handles.views.axial_info.PixelSpacing(2);
+    M(1:3,1) = axial_info.ImageOrientationPatient(1:3).*axial_info.PixelSpacing(1);
+    M(1:3,2) = axial_info.ImageOrientationPatient(4:6).*axial_info.PixelSpacing(2);
 
     i = [0 511];
     j = [0 511];
@@ -46,9 +46,9 @@ function [X,Y,Z,triTexture] = axial_rcs(axial_info,img)
     C = B-U;     %# Point C
 
     [nRows,nCols,nPages] = size(img);  %# Image dimensions
-    inputCorners = [origin; A, B, C];        %# Corner coordinates of input space
+    inputCorners = [origin; A; B; C];        %# Corner coordinates of input space
 
-    outputCorners = [origin;  A, B, C];       %# Corner coordinates of output space           
+    outputCorners = [origin;  A; B; C];       %# Corner coordinates of output space           
 
     tform = maketform('projective',...  %# Make the transformation structure
                       inputCorners,...
