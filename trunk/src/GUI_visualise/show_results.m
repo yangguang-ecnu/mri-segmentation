@@ -22,7 +22,7 @@ function varargout = show_results(varargin)
 
 % Edit the above text to modify the response to help show_results
 
-% Last Modified by GUIDE v2.5 01-Oct-2013 11:43:28
+% Last Modified by GUIDE v2.5 21-Nov-2013 12:12:14
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -98,7 +98,7 @@ if handles.current_result < 1
     handles.current_result = 1;
 end
 
-set(handles.edit_result,'String',['Otsu segmentation ',...
+set(handles.edit_result,'String',['MRI slices',...
     ', Total: ',num2str(handles.current_result), '/',num2str(handles.slices_dbt)]);
 
 axes(handles.axes_result)
@@ -119,7 +119,7 @@ if handles.current_result > handles.slices_dbt
     handles.current_result = handles.slices_dbt;
 end
 
-set(handles.edit_result,'String',['Otsu segmentation ',...
+set(handles.edit_result,'String',['MRI slices',...
     ', Total: ',num2str(handles.current_result), '/',num2str(handles.slices_dbt)]);
 
 axes(handles.axes_result)
@@ -152,16 +152,18 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in pushbutton_save.
-function pushbutton_save_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton_save (see GCBO)
+% --- Executes on button press in pushbutton_close.
+function pushbutton_close_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_close (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 %Path = uigetdir('/home/raquel/MT/thesis_tomosynthesis/resources/', 'Select folder to save ...');
 
-seg_vol = handles.seg;
+close all;
 
-save(['otsu3d_','.mat'],'seg_vol');
+% seg_vol = handles.seg;
+% 
+% save(['otsu3d_','.mat'],'seg_vol');
 
 % for i=1:handles.slices_dbt
 %     tmp = handles.result(:,:,i);
