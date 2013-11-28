@@ -32,7 +32,7 @@ for i=3:size(dcm,1)
         alpha_ch{i-2} = alpha;
         
         if show == 1
-            h = imshow(images{i-2},[]);title(['Image: ',dcm(i).name]);
+            h = imshow(images{i-2});title(['Image: ',dcm(i).name]);
             set(h,'AlphaData',alpha_ch{i-2});
             pause;
             close;
