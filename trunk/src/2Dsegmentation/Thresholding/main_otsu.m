@@ -14,7 +14,7 @@ D = views.axial;
 D = aniso2D(D);
 
 %% Set the number of labels
-n= 3;
+n = 5;
 
 %% Compute thresholding using Otsu method
 %% Otsu returns a labeled image between 1-n
