@@ -4,7 +4,7 @@
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-folder = 'resources/patients/DALLOT/';
+folder = 'resources/patients/patient-2013/';
 
 %% Read the dicomdir and save the info in dicomdir.mat in 'folder'
 load_dicomdir(folder);
@@ -17,5 +17,5 @@ views = get_3views(dcmdir);
 
 %% Clear the rest of the data
 
-clear dcmdir dcmdirlistVal folder mat_file
+clear dcmdirlistVal folder mat_file %dcmdir
 clc
