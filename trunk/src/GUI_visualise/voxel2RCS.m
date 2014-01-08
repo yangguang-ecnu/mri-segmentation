@@ -8,28 +8,30 @@ function voxel2RCS(views)
 %%%%%%%%%%%%%%% Axial %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % disp('Axial')
 % 
-% views.axial_info{1}.SliceThickness
-% views.axial_info{1}.SpacingBetweenSlices
+views.axial_info{1}.SliceThickness
+views.axial_info{1}.SpacingBetweenSlices
 % 
-% views.axial_info{1}.ImagePositionPatient
+ views.axial_info{1}.ImagePositionPatient
+views.axial_info{2}.ImagePositionPatient
 % views.axial_info{1}.ImageOrientationPatient
+% views.axial_info{2}.ImageOrientationPatient
 % 
 % disp('Sagittal')
 % 
-% views.sagittal_info{1}.SliceThickness
-% views.sagittal_info{1}.SpacingBetweenSlices
+views.sagittal_info{1}.SliceThickness
+views.sagittal_info{1}.SpacingBetweenSlices
 % 
-% views.sagittal_info{1}.ImagePositionPatient
+ views.sagittal_info{1}.ImagePositionPatient
 % views.sagittal_info{1}.ImageOrientationPatient
 % 
 % disp('Coronal')
 % 
-% views.coronal_info{1}.SliceThickness
-% views.coronal_info{1}.SpacingBetweenSlices
+views.coronal_info{1}.SliceThickness
+views.coronal_info{1}.SpacingBetweenSlices
 % 
-% views.coronal_info{1}.ImagePositionPatient
+views.coronal_info{1}.ImagePositionPatient
 % views.coronal_info{1}.ImageOrientationPatient
-% views.coronal_info{1}.SliceLocation
+%views.coronal_info{1}.SliceLocation
 
 
 figure;
@@ -41,7 +43,8 @@ M(4,4) = 1;
 M(1:3,1) = views.axial_info{25}.ImageOrientationPatient(1:3).*views.axial_info{25}.PixelSpacing(1);
 M(1:3,2) = views.axial_info{25}.ImageOrientationPatient(4:6).*views.axial_info{25}.PixelSpacing(2);
 
-
+p = cross( views.axial_info{25}.ImageOrientationPatient(1:3),views.axial_info{25}.ImageOrientationPatient(4:6));
+M(1:3,3) = p .* views.axial_info{25}.SpacingBetweenSlices;
 
 i = [0 511];
 j = [0 511];
@@ -51,7 +54,7 @@ y = [];
 z = [];
 for k=1:2
     for l=1:2
-    p = M*[i(k) j(l) 0 1]';
+    p = M*[i(k) j(l) 25 1]';
     plot3(p(1),p(2),p(3),'+r');hold on
         x = [x p(1)];
         y = [y p(2)];
@@ -73,7 +76,7 @@ M(4,4) = 1;
 M(1:3,1) = views.sagittal_info{24}.ImageOrientationPatient(1:3).*views.sagittal_info{24}.PixelSpacing(1);
 M(1:3,2) = views.sagittal_info{24}.ImageOrientationPatient(4:6).*views.sagittal_info{24}.PixelSpacing(2);
 
-
+M*[11 94 0 1]'
 
 i = [0 511];
 j = [0 511];
@@ -100,7 +103,6 @@ M(1:3,4) = views.coronal_info{25}.ImagePositionPatient;
 M(4,4) = 1;
 M(1:3,1) = views.coronal_info{25}.ImageOrientationPatient(1:3).*views.coronal_info{25}.PixelSpacing(1);
 M(1:3,2) = views.coronal_info{25}.ImageOrientationPatient(4:6).*views.coronal_info{25}.PixelSpacing(2);
-
 
 
 i = [0 511];
