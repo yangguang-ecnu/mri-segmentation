@@ -4,6 +4,8 @@ function save_view(volume,folder)
 %%  Save the given view (volume) in the given folder path
 %%  NOTE: the path should not contain '/' at the end
 %%
+%% Execute:
+%% - save_view(views.axial,'resources/results/axial');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 folder = strcat(folder,'/image');

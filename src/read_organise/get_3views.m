@@ -1,15 +1,23 @@
 function views = get_3views(dicom_series)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
-%%  From the given struct extract the 3 views (axial, sagittal and coronal)
+%%  From the given struct 'dicom_series', it extracts 
+%%  the 3 views (axial, sagittal and coronal)
 %% 
 %%  Inputs:  1. dicom_series -> struct containing dicomdir info
 %%  Outputs: 1. views -> struct containing axial, sagittal, coronal
-%%                       matrices of size (512,512,s)
+%%                       matrices of size (512,512,s), and its corresponding
+%%                       dicom_info
+%%                      e.g., views.axial & views.axial_info
 %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Execute:
+%% -folder = 'resources/patients/patient1/' % folder containing dicomdir file
+%% -load_dicomdir(folder);
+%% -views = get_3views(dcmdir);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Most of the times the second series corresponds to sagittal
+
 for i = 1:length(dicom_series.dcmPatient.Study.Series)
     
     if strcmp(dicom_series.dcmPatient.Study.Series(i,1).SeriesDescription,'SAG T2 PROPELLER')
@@ -22,13 +30,7 @@ for i = 1:length(dicom_series.dcmPatient.Study.Series)
     
 end
 
-% if strcmp(dicom_series.dcmPatient.Study.Series(2,1).SeriesDescription,'SAG T2 PROPELLER')
-%     series = 2;
-% elseif strcmp(dicom_series.dcmPatient.Study.Series(3,1).SeriesDescription,'SAG T2 PROPELLER')
-%     series = 3;
-% else
-%     'Set the series number'
-% end
+
 %% Series Sagittal
 [m n] = size(dicom_series.dcmPatient.Study.Series(series_sag,1).Images{1});
 [p q] = size(dicom_series.dcmPatient.Study.Series(series_sag,1).Images);
