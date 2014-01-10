@@ -30,7 +30,7 @@ for k = 7:16%1:size(views.axial,3)
                r = str2num(input('Press 1 whenever you are ready  ','s'));
             end
 
-             h = impoly;
+            h = impoly;
             h_position = getPosition(h);
             [Vertices Lines] = contour(h_position);
 
@@ -39,7 +39,7 @@ for k = 7:16%1:size(views.axial,3)
 
             tmp = poly2mask(vert{k,i}(:,1),vert{k,i}(:,2),rows,cols);
 
-            tmp = imdilate(tmp,ones(3,3));
+            %tmp = imdilate(tmp,ones(3,3));
 
             I_texture(:,:,k) = I_texture(:,:,k) | tmp;
 
