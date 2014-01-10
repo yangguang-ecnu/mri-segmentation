@@ -10,13 +10,13 @@ p.x(end +1) = p.x(1);
 p.y(end +1) = p.y(1);
 
 % Interpolate to get more points
-r=10;
+r=5;
 pointsx=interp(p.x,r); pointsx=pointsx(1:end-r+1);
 pointsy=interp(p.y,r); pointsy=pointsy(1:end-r+1);
 
 
 %imshow(handles.views.axial(:,:,handles.current_axial),[]);hold on
-plot(pointsy,pointsx,'b','LineWidth',2); 
+%plot(pointsy,pointsx,'b','LineWidth',2); 
 
 totalx=[]; totaly=[];
 pointst = 1:length(pointsx);
@@ -36,9 +36,9 @@ for j=1:length(i)-1
     liney=interp1(dist,liney,dist2);
     % Display the line piece
     %if(verbose),
-        plot(liney,linex,'g*','MarkerSize',4);
-        plot(liney(1),linex(1),'r*','MarkerSize',4);
-        plot(liney(end),linex(end),'r*','MarkerSize',4); 
+%         plot(liney,linex,'g*','MarkerSize',4);
+%         plot(liney(1),linex(1),'r*','MarkerSize',4);
+%         plot(liney(end),linex(end),'r*','MarkerSize',4); 
     %end
     % Remove Point because it is also in the next line piece
     if(j<i-1), linex(end)=[]; liney(end)=[]; end
@@ -46,6 +46,6 @@ for j=1:length(i)-1
     totalx=[totalx linex];
     totaly=[totaly liney];
 end
-%Vertices = [totalx(:) totaly(:)];
+%Vertices = [pointsy pointsx];
 Vertices = [p.y(:) p.x(:)];
 Lines = [(1:size(Vertices,1))' ([2:size(Vertices,1) 1])'];
