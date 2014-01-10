@@ -13,7 +13,7 @@ Z_sag = [];
 
 figure(1);hold on
 
-for ax=1:size(views.axial,3)-1:size(views.axial,3)
+for ax=1:size(views.axial,3)
     M = zeros(4,4);
     
     M(1:3,4) = views.axial_info{ax}.ImagePositionPatient;
@@ -90,18 +90,18 @@ for ax=1:size(views.axial,3)-1:size(views.axial,3)
     
     
     points = [x' y' z'];
-    fill3(points(:,1),points(:,2),points(:,3),'r');hold on
-    alpha(0.5)
+%     fill3(points(:,1),points(:,2),points(:,3),'r');hold on
+%     alpha(0.5)
     
     X_ax = [X_ax x'];
     Y_ax = [Y_ax y'];
     Z_ax = [Z_ax z'];
 end
-%plot3([x x(1)],[y y(1)],[z z(1)]);
+
 
 %% Sagittal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-for sag=1:size(views.sagittal,3)-1:size(views.sagittal,3)
+for sag=1:size(views.sagittal,3)
     M = zeros(4,4);
     
     M(1:3,4) = views.sagittal_info{sag}.ImagePositionPatient;
@@ -126,8 +126,6 @@ for sag=1:size(views.sagittal,3)-1:size(views.sagittal,3)
             z = [z p(3)];
         end
     end
-    
-    
     
     P1 = [x(1) y(1) z(1)];
     P2 = [x(2) y(2) z(2)];
@@ -171,8 +169,8 @@ for sag=1:size(views.sagittal,3)-1:size(views.sagittal,3)
     Z1 = z(index);        %# z coordinates of surface
     
     points = [x' y' z'];
-    fill3(points(:,1),points(:,2),points(:,3),'b');hold on
-    alpha(0.3)
+%     fill3(points(:,1),points(:,2),points(:,3),'b');hold on
+%     alpha(0.3)
     
     X_sag = [X_sag x'];
     Y_sag = [Y_sag y'];
@@ -180,84 +178,74 @@ for sag=1:size(views.sagittal,3)-1:size(views.sagittal,3)
 end
 
 
-%%%%%%%%%%% Plane intersection %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Intersections Axial & Sagittal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+var = [];
+ax=1:size(views.axial,3);
+sag=1:size(views.sagittal,3);
 
-% Axial 1 Sagittal 1
-N1 = cross([X_ax(1,1) Y_ax(1,1) Z_ax(1,1)]-[X_ax(2,1) Y_ax(2,1) Z_ax(2,1)],[X_ax(1,1) Y_ax(1,1) Z_ax(1,1)]-[X_ax(3,1) Y_ax(3,1) Z_ax(3,1)]);
-A1 = [X_ax(4,1) Y_ax(4,1) Z_ax(4,1)];
+options = optimset('Display','off');
 
-N2 = cross([X_sag(1,1) Y_sag(1,1) Z_sag(1,1)]-[X_sag(2,1) Y_sag(2,1) Z_sag(2,1)],[X_sag(1,1) Y_sag(1,1) Z_sag(1,1)]-[X_sag(3,1) Y_sag(3,1) Z_sag(3,1)]);
-A2 = [X_sag(4,1) Y_sag(4,1) Z_sag(4,1)];
+for i=1:length(ax)
+    for j=1:length(sag)
+    
+    
+        x_t = [X_ax(:,i);X_sag(:,j)];
+        y_t = [Y_ax(:,i);Y_sag(:,j)];
+        z_t = [Z_ax(:,i);Z_sag(:,j)];
 
-[P1,dir1,check]=plane_intersect(N1,A1,N2,A2);
+        [A1,b1,Aeq1,beq1] = vert2lcon([X_ax(:,i) Y_ax(:,i) Z_ax(:,i)]);
+        [A2,b2,Aeq2,beq2] = vert2lcon([X_sag(:,j) Y_sag(:,j) Z_sag(:,j)]);
 
-l = [P1-40.*dir1./norm(dir1); P1 + 40.*dir1./norm(dir1)];
+        normal = cross([X_sag(1,j) Y_sag(1,j) Z_sag(1,j)]-[X_sag(2,j) Y_sag(2,j) Z_sag(2,j)],[X_sag(1,j) Y_sag(1,j) Z_sag(1,j)]-[X_sag(3,j) Y_sag(3,j) Z_sag(3,j)]);
 
-plot3(l(:,1),l(:,2),l(:,3),'k');hold on
-plot3(P1(1),P1(2),P1(3),'k+')
-
-% Axial 1 Sagittal end
-N1 = cross([X_ax(1,1) Y_ax(1,1) Z_ax(1,1)]-[X_ax(2,1) Y_ax(2,1) Z_ax(2,1)],[X_ax(1,1) Y_ax(1,1) Z_ax(1,1)]-[X_ax(3,1) Y_ax(3,1) Z_ax(3,1)]);
-A1 = [X_ax(4,1) Y_ax(4,1) Z_ax(4,1)];
-
-N2 = cross([X_sag(1,end) Y_sag(1,end) Z_sag(1,end)]-[X_sag(2,end) Y_sag(2,end) Z_sag(2,end)],[X_sag(1,end) Y_sag(1,end) Z_sag(1,end)]-[X_sag(3,end) Y_sag(3,end) Z_sag(3,end)]);
-A2 = [X_sag(4,end) Y_sag(4,end) Z_sag(4,end)];
-
-[P2,dir2,check]=plane_intersect(N1,A1,N2,A2);
-
-l = [P2-40.*dir2./norm(dir2); P + 40.*dir2./norm(dir2)];
-
-plot3(l(:,1),l(:,2),l(:,3),'k');hold on
-plot3(P2(1),P2(2),P2(3),'k+')
+        A = [A1;A2];
+        b = [b1;b2];
+        Aeq = [Aeq1;Aeq2];
+        beq = [beq1;beq2];
 
 
-% % Axial end Sagittal 1
-N1 = cross([X_ax(1,end) Y_ax(1,end) Z_ax(1,end)]-[X_ax(2,end) Y_ax(2,end) Z_ax(2,end)],[X_ax(1,end) Y_ax(1,end) Z_ax(1,end)]-[X_ax(3,end) Y_ax(3,end) Z_ax(3,end)]);
-A1 = [X_ax(4,end) Y_ax(4,end) Z_ax(4,end)];
+        [x0,fval,exitflag,output,lambda] = linprog(normal,A,b,Aeq,beq,[],[],[],options);
 
-N2 = cross([X_sag(1,1) Y_sag(1,1) Z_sag(1,1)]-[X_sag(2,1) Y_sag(2,1) Z_sag(2,1)],[X_sag(1,1) Y_sag(1,1) Z_sag(1,1)]-[X_sag(3,1) Y_sag(3,1) Z_sag(3,1)]);
-A2 = [X_sag(4,1) Y_sag(4,1) Z_sag(4,1)];
+        [V1,nr,nre] = qlcon2vert(x0, A,b,Aeq,beq);
 
-[P3,dir3,check]=plane_intersect(N1,A1,N2,A2);
+        %plot3(V1(:,1),V1(:,2),V1(:,3),'g*');hold on
 
-l = [P3-40.*dir3./norm(dir3); P3 + 40.*dir3./norm(dir3)];
+        %a = line(V1(:,1),V1(:,2),V1(:,3));
+        %line([V1(1,1) V1(1,2) V1(1,3)], [V1(2,1),V1(2,2),V1(2,3)], 'g')
 
-plot3(l(:,1),l(:,2),l(:,3),'k');hold on
-plot3(P1(1),P1(2),P1(3),'k+')
+        t = 0:.5:1;
+        vd = - [V1(1,1),V1(1,2),V1(1,3)] + [V1(2,1),V1(2,2),V1(2,3)];
 
-% % Axial end Sagittal end
-N1 = cross([X_ax(1,end) Y_ax(1,end) Z_ax(1,end)]-[X_ax(2,end) Y_ax(2,end) Z_ax(2,end)],[X_ax(1,end) Y_ax(1,end) Z_ax(1,end)]-[X_ax(3,end) Y_ax(3,end) Z_ax(3,end)]);
-A1 = [X_ax(4,end) Y_ax(4,end) Z_ax(4,end)];
+        for k=1:length(t)
+            plot3(V1(1,1) + vd(1)*t(k),V1(1,2) + vd(2)*t(k),V1(1,3) + vd(3)*t(k),'k+');hold on
+            var = [var;V1(1,1) + vd(1)*t(k) V1(1,2) + vd(2)*t(k) V1(1,3) + vd(3)*t(k)];
+            vert_mat(k,j,i) = (i-1)*(length(ax)-1) + (k-1)+ j-1 + (k-1)*(length(sag)-1);
+        end
+        
+        
+    end
+end
 
-N2 = cross([X_sag(1,end) Y_sag(1,end) Z_sag(1,end)]-[X_sag(2,end) Y_sag(2,end) Z_sag(2,end)],[X_sag(1,end) Y_sag(1,end) Z_sag(1,end)]-[X_sag(3,end) Y_sag(3,end) Z_sag(3,end)]);
-A2 = [X_sag(4,end) Y_sag(4,end) Z_sag(4,end)];
+%[dt] = MyCrust(var);
+dt = DelaunayTri(var);%delaunay(var);%
+FV2.faces = dt;
+FV2.vertices = var;
+trisurf(FV2.faces,FV2.vertices(:,1),FV2.vertices(:,2),FV2.vertices(:,3),'facecolor','r','facealpha',.1,'edgecolor','b','facelighting','flat');camlight
+axis equal
 
-[P4,dir4,check]=plane_intersect(N1,A1,N2,A2);
+% edgeIndex = edges(dt);              %# Triangulation edge indices
+% midpts = [mean(var(edgeIndex,1),2) ...  %# Triangulation edge midpoints
+%           mean(var(edgeIndex,2),2) ...
+%           mean(var(edgeIndex,3),2)];
+% nearIndex = nearestNeighbor(dt,midpts);  %# Find the vertex nearest the midpoints
+% keepIndex = (nearIndex == edgeIndex(:,1)) | ...  %# Find the edges where the
+%             (nearIndex == edgeIndex(:,2));                                    %#   another vertex than it is
+%                                                  %#   to one of its end vertices
+% edgeIndex = edgeIndex(keepIndex,:);      %# The "good" edges
+% And now edgeIndex is an N-by-2 matrix where each row contains the indices into x and y for one edge that defines a "near" connection. The following plot illustrates the Delaunay triangulation (red lines), Voronoi diagram (blue lines), midpoints of the triangulation edges (black asterisks), and the "good" edges that remain in edgeIndex (thick red lines):
+% 
+% triplot(dt,'r');  %# Plot the Delaunay triangulation
+% hold on;          %# Add to the plot
+% plot3(var(edgeIndex,1).',var(edgeIndex,2).',var(edgeIndex,3).','r-','LineWidth',3);  %# Plot the "good" edges
 
-l = [P4-40.*dir4./norm(dir4); P4 + 40.*dir4./norm(dir4)];
-
-plot3(l(:,1),l(:,2),l(:,3),'k');hold on
-plot3(P1(1),P1(2),P1(3),'k+')
-
-x = [X_ax(:,1);X_sag(:,1)];
-y = [Y_ax(:,1);Y_sag(:,1)];
-z = [Z_ax(:,1);Z_sag(:,1)];
-
-V = [x y z];
-
-[A1,b1,Aeq1,beq1] = vert2lcon([X_ax(:,1) Y_ax(:,1) Z_ax(:,1)]);
-[A2,b2,Aeq2,beq2] = vert2lcon([X_sag(:,1) Y_sag(:,1) Z_sag(:,1)]);
-
-normal = cross([X_sag(1,1) Y_sag(1,1) Z_sag(1,1)]-[X_sag(2,1) Y_sag(2,1) Z_sag(2,1)],[X_sag(1,1) Y_sag(1,1) Z_sag(1,1)]-[X_sag(3,1) Y_sag(3,1) Z_sag(3,1)]);
-
-f = [normal -(P1(1)*normal(1) + P1(2)*normal(2) + P1(3)*normal(3))];
-
-A = [A1;A2];
-b = [b1;b2];
-Aeq = [Aeq1;Aeq2];
-beq = [beq1;beq2];
-
-
-[x,fval,exitflag,output,lambda] = linprog(normal,A,b,Aeq,beq);
-
-[V,nr,nre] = qlcon2vert(x, A,b,Aeq,beq)
+%tetramesh(dt);
