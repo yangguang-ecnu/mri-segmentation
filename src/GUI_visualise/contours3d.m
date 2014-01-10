@@ -63,7 +63,8 @@ handles.views = varargin{1};
 handles.vol_axial = handles.views.axial;
 handles.s_axial = size(handles.vol_axial,3); %% number of slices
 handles.slider_axial_val = 1;%% slider value
-
+handles.contour_axial = [];
+handles.vert_axial = [];
 
 handles.vol_sagittal = handles.views.sagittal;
 handles.s_sagittal = size(handles.vol_sagittal,3); %% number of slices
@@ -149,45 +150,91 @@ function pushbutton_3dcontours_Callback(hObject, eventdata, handles)
 
 a = get(handles.edit_load_mask,'String');
 
-%% Read the images from the folder
-[handles.masks handles.alpha_ch] = read_images(a,0);
+handles.contour_axial = load(a);
 
-% Update handles structure
-guidata(hObject, handles);
+handles.vert_axial = handles.contour_axial.vertex;
 
-% Flag 
-handles.view3d = 1;
+rows = size(handles.vol_axial,1);
+cols = size(handles.vol_axial,2);
 
 axes(handles.axes_3dview);
 axis on
 cla
-    
-for ax = 1:handles.s_axial
-    
-%    if min(min(handles.masks{ax})) ~= max(max(handles.masks{ax}))
 
-        [X,Y,Z,triTexture] = axial_rcs(handles.views.axial_info{ax},handles.masks{ax});
 
+
+for k=1:handles.s_axial
+    
+    if ~isempty(handles.vert_axial{k})
+        [Vertices Lines] = contour(handles.vert_axial{k});
+
+        vert{k} = Vertices;
+        lines{k} = Lines;
+
+        I_mask(:,:,k) = poly2mask(vert{k}(:,1),vert{k}(:,2),rows,cols);
+        
+        
+        
+        [X,Y,Z,triTexture] = axial_rcs(handles.views.axial_info{k},1-double(I_mask(:,:,k)));
+        
+        
+%         triTexture(:,:,1) = triTexture;
+%         triTexture(:,:,2) = zeros(rows,cols);
+%         triTexture(:,:,3) = zeros(rows,cols);
+        
+        
         hSurface = surf(X,Y,Z,'cdata',triTexture,...          %# Plot texture-mapped surface
                         'FaceColor','texturemap');hold on
 
-        set(hSurface,'edgecolor','none','facealpha','texture','alphadata',handles.alpha_ch{ax});
+        set(hSurface,'edgecolor','none','facealpha','texture','alphadata',double(I_mask(:,:,k)));
 
         alpha('direct');
-        alphamap([.01;1]);
-
-
-        X_all{ax} = X;
-        Y_all{ax} = Y;
-        Z_all{ax} = Z;
-
-        texture_all{ax} = triTexture;
-
-
+        alphamap([0.6;1]);
         axis equal 
-%    end
-
+    end
+    
 end
+% a = get(handles.edit_load_mask,'String');
+% 
+% %% Read the images from the folder
+% [handles.masks handles.alpha_ch] = read_images(a,0);
+% 
+% % Update handles structure
+% guidata(hObject, handles);
+% 
+% % Flag 
+% handles.view3d = 1;
+% 
+% axes(handles.axes_3dview);
+% axis on
+% cla
+%     
+% for ax = 1:handles.s_axial
+%     
+% %    if min(min(handles.masks{ax})) ~= max(max(handles.masks{ax}))
+% 
+%         [X,Y,Z,triTexture] = axial_rcs(handles.views.axial_info{ax},handles.masks{ax});
+% 
+%         hSurface = surf(X,Y,Z,'cdata',triTexture,...          %# Plot texture-mapped surface
+%                         'FaceColor','texturemap');hold on
+% 
+%         set(hSurface,'edgecolor','none','facealpha','texture','alphadata',handles.alpha_ch{ax});
+% 
+%         alpha('direct');
+%         alphamap([.01;1]);
+% 
+% 
+%         X_all{ax} = X;
+%         Y_all{ax} = Y;
+%         Z_all{ax} = Z;
+% 
+%         texture_all{ax} = triTexture;
+% 
+% 
+%         axis equal 
+% %    end
+% 
+% end
 
 
 
