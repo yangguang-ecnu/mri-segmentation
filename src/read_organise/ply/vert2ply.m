@@ -4,10 +4,14 @@ function vert2ply(mat_file,ply_file)
 %%  Given a .mat file containing 'vertex' as cells, write them in a txt file
 %%  given by txt_file
 %%
+%%  NOTE: In the mat file the points are in the frame coordinates, and the
+%%        ply file will have the points in the same coordinates system !
+%%
 %%  Inputs: 1. mat_file -> *.mat with 'vertex' as cells
 %%          2. ply_file -> name of the ply file where 
 %%                         to write the vertex info 
-%%
+%% EXECUTE
+%% vert2ply('resources/manual_seg/LASSALAS/lassalas_uterus_ax.mat','lassalas_uterus_ax.ply');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 a = load(mat_file);
 
