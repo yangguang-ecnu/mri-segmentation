@@ -47,9 +47,9 @@ FV.vertices = var;
 FV.faces = t;
 
 %% plot of the output triangulation
-figure(1)
+figure
 hold on
-title('Output Triangulation','fontsize',14)
+%title('Output Triangulation','fontsize',14)
 axis equal
 trisurf(t,var(:,1),var(:,2),var(:,3),'facecolor','c','edgecolor','b');camlight
 %patch(FV,'FaceColor',[0 1 1],'EdgeColor','interp'); view(3); camlight
@@ -62,9 +62,9 @@ FV2 = smoothpatch(FV,1,5);
 faces = FV2.faces;
 vertices = FV2.vertices;
 
-figure(2)
+figure
 hold on
-title('Output Smooth Triangulation','fontsize',14)
+%title('Output Smooth Triangulation','fontsize',14)
 axis equal
 trisurf(FV2.faces,FV2.vertices(:,1),FV2.vertices(:,2),FV2.vertices(:,3),'facecolor','c','edgecolor','b','edgealpha',0,'facelighting','flat');camlight
 %patch(FV2,'FaceColor',[0 1 1]); view(3); camlight %'EdgeAlpha',0
