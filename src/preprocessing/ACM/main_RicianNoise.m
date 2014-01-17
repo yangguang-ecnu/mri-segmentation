@@ -72,23 +72,20 @@ s=size(ima);
 minl = 3;
 maxl = 3;%21;
 
-
-i = minl
-
 % Create noisy data with Rician noise
-level=max(ima(:))/100;
+level = max(ima(:))/100;
 %rima=sqrt((ima+level*randn(s)).^2+(level*randn(s)).^2);
 rima = ima;
 
 %params
-M=3;
-alpha=1.5;
+M = 3;
+alpha = 1;
 
 % Filtering with Su parameters: small patch
-tic,
-h=level;
-fima1=ornlm(rima,M,alpha,h);
-t1(i)=toc;
+% tic,
+% h = level;
+% fima1 = ornlm(rima,M,alpha,h);
+% t1 = toc;
 
 % % Filtering with So parameters: big patch 
 % tic,
@@ -113,10 +110,10 @@ t1(i)=toc;
 % 
 % % Coupe blockwise approach with parameters used in TMI 08
 % % Search are of 11^3 of voxels
-% tic,
-% h=level;
-% fima1=ornlm(rima,M+2,alpha,h);
-% t1(i)=toc;
+tic,
+h= 6*level;
+fima1=ornlm(rima,M+2,alpha,h);
+t1=toc
 % 
 % 
 % % Remove residual error in reconstructions after IDWT
@@ -211,4 +208,4 @@ t1(i)=toc;
 
 show_results(fima1);
 
-
+sum((fima1(:)-ima(:)).^2)
