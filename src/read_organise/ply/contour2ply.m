@@ -11,7 +11,7 @@ vert = a.vertex;
 
 %% number of slices
 N = length(vert);
-length(patient)
+
 
 x = [];
 y = [];
@@ -32,7 +32,7 @@ for i = 1:length(patient)
         
         for k=1:size(vert{i},1)
             
-            p = M*[vert{i}(k,2) vert{i}(k,1) 0 1]';
+            p = M*[vert{i}(k,1) vert{i}(k,2) 0 1]';
             
             x = [x p(1)];
             y = [y p(2)];
@@ -60,7 +60,7 @@ fprintf(fileId, 'property float32 z\n');
 fprintf(fileId, 'end_header\n');
 
 % writing the vertexes
-x
+
 for i=1:length(x)
     fprintf(fileId, '%f %f %f \n', x(i), y(i),z(i));
 end
