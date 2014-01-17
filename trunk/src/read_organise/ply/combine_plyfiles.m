@@ -86,12 +86,12 @@ if save_file
     fprintf(fileId, 'property float32 y\n');
     fprintf(fileId, 'property float32 z\n');
     
-    fprintf(fileId, 'element face %d\n', size(FV2.faces,1));%t
-    fprintf(fileId, 'property list int32 int32 vertex_indices\n');
-    
-    fprintf(fileId, 'property uchar red\n');
-    fprintf(fileId, 'property uchar green\n');
-    fprintf(fileId, 'property uchar blue\n');
+%     fprintf(fileId, 'element face %d\n', size(FV2.faces,1));%t
+%     fprintf(fileId, 'property list int32 int32 vertex_indices\n');
+%     
+%     fprintf(fileId, 'property uchar red\n');
+%     fprintf(fileId, 'property uchar green\n');
+%     fprintf(fileId, 'property uchar blue\n');
     
     fprintf(fileId, 'end_header\n');
     
@@ -102,9 +102,9 @@ if save_file
     end
     
     % writing the faces
-    for i = 1 : size(FV2.faces,1)
-        fprintf(fileId, '3 %d %d %d %u %u %u\n', int32(FV2.faces(i,1)), int32(FV2.faces(i,2)), int32(FV2.faces(i,3)), 0, 255, 255);
-    end
+%     for i = 1 : size(FV2.faces,1)
+%         fprintf(fileId, '3 %d %d %d %u %u %u\n', int32(FV2.faces(i,1)), int32(FV2.faces(i,2)), int32(FV2.faces(i,3)), 0, 255, 255);
+%     end
     fclose(fileId);
     
 end
