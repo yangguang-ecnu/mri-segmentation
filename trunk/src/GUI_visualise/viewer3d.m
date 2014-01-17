@@ -58,7 +58,10 @@ function viewer3d_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 handles.views = varargin{1};
-handles.triangulation = varargin{2};
+handles.triangulation = [];
+if length(varargin) > 1
+    handles.triangulation = varargin{2};
+end
 
 handles.vol_axial = handles.views.axial;
 handles.s_axial = size(handles.vol_axial,3); %% number of slices
@@ -196,7 +199,9 @@ hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
 
 axis equal
 
-trisurf(handles.triangulation.faces,handles.triangulation.vertices(:,1),handles.triangulation.vertices(:,2),handles.triangulation.vertices(:,3),'facecolor','c','edgecolor','none','facelighting','flat');camlight
+if ~isempty(handles.triangulation)
+    trisurf(handles.triangulation.faces,handles.triangulation.vertices(:,1),handles.triangulation.vertices(:,2),handles.triangulation.vertices(:,3),'facecolor','c','edgecolor','none','facelighting','flat');camlight
+end
 
 view(3)
 
