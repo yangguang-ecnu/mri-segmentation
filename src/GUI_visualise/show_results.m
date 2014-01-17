@@ -25,7 +25,7 @@ function varargout = show_results(varargin)
 % Last Modified by GUIDE v2.5 21-Nov-2013 12:12:14
 
 % Begin initialization code - DO NOT EDIT
-gui_Singleton = 1;
+gui_Singleton = 0;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
                    'gui_OpeningFcn', @show_results_OpeningFcn, ...
@@ -59,12 +59,15 @@ handles.seg = cell2mat(varargin(1));
 handles.current_result = 1;
 handles.slices_dbt = size(handles.seg,3);
 
+handles.max = max(max(max(handles.seg)));
+handles.min = min(min(min(handles.seg)));
+
+% 
+% axes(handles.axes_result);
+% axis off
 
 axes(handles.axes_result);
-axis off
-
-axes(handles.axes_result);
-imshow(handles.seg(:,:,1),[]);
+imshow(handles.seg(:,:,1),[handles.min handles.max]);
 
 set(handles.edit_result,'String',['MRI slices',...
     ', Total: ',num2str(handles.current_result), '/',num2str(handles.slices_dbt)]);
@@ -102,7 +105,7 @@ set(handles.edit_result,'String',['MRI slices',...
     ', Total: ',num2str(handles.current_result), '/',num2str(handles.slices_dbt)]);
 
 axes(handles.axes_result)
-imshow(handles.seg(:,:,handles.current_result),[])
+imshow(handles.seg(:,:,handles.current_result),[handles.min handles.max])
 axis off
 
 % Update handles structure
@@ -123,7 +126,7 @@ set(handles.edit_result,'String',['MRI slices',...
     ', Total: ',num2str(handles.current_result), '/',num2str(handles.slices_dbt)]);
 
 axes(handles.axes_result)
-imshow(handles.seg(:,:,handles.current_result),[])
+imshow(handles.seg(:,:,handles.current_result),[handles.min handles.max])
 axis off
 
 % Update handles structure
