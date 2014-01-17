@@ -9,6 +9,7 @@ X_sag = [];
 Y_sag = [];
 Z_sag = [];
 
+disp('--------- Calculate M^(-1) and plane eq. for each slice in the first direction -----')
 %% Axial %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global vol_ax
 global vol_sag
@@ -27,20 +28,20 @@ cols = size(views.axial,2);
 total_ax = size(views.axial,3);
 total_sag = size(views.sagittal,3);
 
-%figure(1);hold on
-
 global plane_ax
 global plane_sag
 
 plane_ax = zeros(total_ax,4);
 plane_sag = zeros(total_sag,4);
 
-M = zeros(4,4);
+
 global axial_m
 global axial_m1
 
 axial_m = cell(1,total_ax);
 axial_m1 = cell(1,total_ax);
+
+M = zeros(4,4);
 
 for ax=1:size(views.axial,3)
     
@@ -69,7 +70,7 @@ for ax=1:size(views.axial,3)
     
 end
 
-
+disp('--------- Calculate M^(-1) and plane eq. for each slice in the second direction -----')
 %% Sagittal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global sag_m
 global sag_m1
@@ -105,16 +106,16 @@ for sag=1:size(views.sagittal,3)
 end
 
 
-
+disp('--------- Calculate the s1 x s2 intersections between planes of the 2 given directions -----')
 %% Intersections Axial & Sagittal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%var = [];
+
 
 ax = 1:size(views.axial,3);
 sag = 1:size(views.sagittal,3);
 
 global t
-t = 0:.5:1;
-%t = [0 .25 .5 .75 1];
+t = 0:1/5:1;
+
 
 global var_cell
 global var_array
@@ -205,8 +206,8 @@ end
 
 [A_c,b_c,Aeq_c,beq_c] = vert2lcon([var_array(:,1) var_array(:,2) var_array(:,3)]);
 
-%show_results(new_im_ax); % show the lines in the frame coordinates
-%show_results(new_im_sag); % show the lines in the frame coordinates
+show_results(new_im_ax); % show the lines in the frame coordinates
+show_results(new_im_sag); % show the lines in the frame coordinates
 
 tic
 %n_points = 1:length(t);%*size(vol_sag,3);
@@ -235,39 +236,13 @@ tic
 %% Plot the planes
 
 fill3(X_ax(:,1),Y_ax(:,1),Z_ax(:,1),'r');hold on % first axial plane
-%fill3(X_ax(:,2),Y_ax(:,2),Z_ax(:,2),'r');hold on % first axial plane
+fill3(X_ax(:,total_ax),Y_ax(:,total_ax),Z_ax(:,total_ax),'r');hold on % first axial plane
 fill3(X_sag(:,1),Y_sag(:,1),Z_sag(:,1),'b');hold on % first sagittal plane
-%fill3(X_sag(:,2),Y_sag(:,2),Z_sag(:,2),'b');hold on % second sagittal plane    
-alpha(.1)
-axis equal
+fill3(X_sag(:,total_sag),Y_sag(:,total_sag),Z_sag(:,total_sag),'b');hold on % second sagittal plane    
 
-time = toc
+time = toc;
 
-%% Define the mesh for FEM %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%figure; % plot the mesh once the intersection points are defined
-
-% for i=1:length(ax)-1
-%     for j=1:length(sag)-1
-% 
-%         for k=1:length(t)-1
-%            
-%             vari = [var_cell{i,j,k};var_cell{i,j,k+1};var_cell{i+1,j,k};var_cell{i+1,j+1,k};var_cell{i,j+1,k};var_cell{i+1,j+1,k+1};var_cell{i,j+1,k+1};var_cell{i+1,j,k+1}];
-%             ind_tmp = sub2ind([size(var_cell,3) size(var_cell,2) size(var_cell,1)],k,j,i);
-
-%             tmp = calculate_tetrahedron(i,j,k,t,sag);
-%             tetra = [tetra;tmp];
-
-%             %dt = DelaunayTri(vari);
-%             % ind2sub(size(var_cell),i,j,k);
-%             %vert_mat(k,j,i) = (i-1)*(length(ax)-1) + (k-1)+ (j-1) + (k-1)*(length(sag)-1);
-%             %plot3(var_cell{i,j,k}(1), var_cell{i,j,k}(2), var_cell{i,j,k}(3),'g*');hold on
-%             %tetramesh(dt,vari,'facealpha',.3);hold on
-%                            
-%         end
-%                 
-%     end
-% end
-
+disp('--------- Calculate the source control points ( # N^3 ) -----')
 %% Calculate the bounding box %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % bb = [xmin xmax;ymin ymax;zmin zmax]
@@ -288,21 +263,103 @@ l_z = linspace(bb(3,1),bb(3,2),nz);
 global source_control
 source_control = zeros(nx * ny * nz,3);
 
-for i=1:nx
-    for j=1:ny
-        for k=1:nz
-            s2ind =  k + nz*(j-1 + ny*(i-1));
-            source_control(s2ind,:) = [l_x(i) l_y(j) l_z(k)];
-        end
+for i = 1:nx
+    for j = 1:ny
+        
+        tmp =  1:nz;
+        s2ind =  tmp + nz*(j-1 + ny*(i-1));
+        
+        source_control(s2ind,1) = repmat(l_x(i),nz,1);
+        source_control(s2ind,2) = repmat(l_y(j),nz,1);
+        source_control(s2ind,3) = l_z(tmp);
+
     end
 end
 
-
+% Plot the source control points 
 for i = 1:nx * ny * nz
     plot3(source_control(i,1),source_control(i,2),source_control(i,3),'k+');hold on
 end
 
+disp('--------- Calculate the source control points mesh (tetrahedrons) -----')
+%% Define the mesh for FEM %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+global tetra
+tetra = [];
+%tetra = zeros((nx-1) * (ny-1) * (nz-1) * 6,4);
+%source_control_or = [];
+for i=1:nx-1
+    
+    for j=1:ny-1
+
+        for k=1:nz-1
+            
+            ind_tmp =  k + nz*(j-1 + ny*(i-1));
+            %ind_tmp = sub2ind([nz ny nx],k,j,i)
+
+            %tmp = calculate_tetrahedron(i,j,k,nz,ny)
+            
+            %tetra(k * ind_tmp: k * ind_tmp + 5,:) = tmp;
+            %tetra = [tetra;tmp];
+            
+            
+            ind_tmp2 =  k+1 + nz*(j-1 + ny*(i-1));
+            ind_tmp3 =  k + nz*(j-1 + ny*(i));
+            ind_tmp4 =  k + nz*(j + ny*(i));
+            ind_tmp5 =  k + nz*(j + ny*(i-1));
+            ind_tmp6 =  k+1 + nz*(j + ny*(i));
+            ind_tmp7 =  k+1 + nz*(j + ny*(i-1));
+            ind_tmp8 =  k+1 + nz*(j-1 + ny*(i));
+                
+            %source_control_or = [source_control_or;vari];
+            tetra = [tetra;...
+                     ind_tmp2 ind_tmp  ind_tmp5 ind_tmp3;...
+                     ind_tmp7 ind_tmp2 ind_tmp5 ind_tmp3;...
+                     ind_tmp7 ind_tmp8 ind_tmp2 ind_tmp3;...
+                     ind_tmp7 ind_tmp4 ind_tmp8 ind_tmp3;...
+                     ind_tmp7 ind_tmp5 ind_tmp4 ind_tmp3;...
+                     ind_tmp7 ind_tmp6 ind_tmp8 ind_tmp4];
+            
+            % Just for the plotting
+            vari = [source_control(ind_tmp,:);source_control(ind_tmp2,:);source_control(ind_tmp3,:);source_control(ind_tmp4,:);...
+                    source_control(ind_tmp5,:);source_control(ind_tmp6,:);source_control(ind_tmp7,:);source_control(ind_tmp8,:)];
+            dt = DelaunayTri(vari);
+            
+            tetramesh(dt);
+            
+        end
+                
+    end
+    
+end
+
+disp('--------- Convert the computed mesh into DelaunayTri class -----')
+%% Convert the computed mesh into DelaunayTri class is gonna help us for computing the
+%% vertices or tetrahedrons that contain a query of points
+
+global source_tri
+
+trep = TriRep(tetra,source_control);
+source_tri = DelaunayTri; 
+source_tri = trep;
+
+alpha(.1)
+axis equal
+
+
+disp('--------- Plot the data points  -----')
+%Plot the data points  
+for i = 1:size(var_array,1)
+    plot3(var_array(i,1),var_array(i,2),var_array(i,3),'k*','MarkerSize',2);hold on
+end
+
+%% Clear memory
+
+varlist = {'X_ax','Y_ax','Z_ax','X_sag','Y_sag','Z_sag','M','rows','cols','total_ax','total_sag','N1','N2','ax','sag','x','y','z','options','i','j','k','A1','b1','Aeq1','beq1','A2','b2','Aeq2','beq2',...
+           'A','b','Aeq','beq','x0','fval','exitflag','output','lambda','V1','nr','ne','vd','ind_tmp','ind_tmp2','ind_tmp3','ind_tmp4','ind_tmp5','ind_tmp6','ind_tmp7','ind_tmp8','tmp_v1','tmp_v',...
+           'new_i','new_j','new_k','neig','A_c','b_c','Aeq_c','beq_c','bb','nx','ny','nz','tmp','s2ind','l_x','l_y','l_z','vari','dt','trep'};
+clear(varlist{:})
+clear varlist
 
 
 
