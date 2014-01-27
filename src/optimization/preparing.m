@@ -45,10 +45,12 @@ in.list_edges = list_edges;
 for i = 1:length(list_edges)
     in.scalar(i) = -1/length(list_edges{i});
 end
-in.lambda = 1;
+in.lambda = .01;
 
 
 % Define the output struct
-out.F = zeros(size(var_array1,1) + size(source_tri.X,1),1);
-out.J = zeros(size(var_array1,1) + size(source_tri.X,1),6*size(source_tri.X,1)); % the control points are duplicated [X0;X0]
+out.F = zeros(size(var_array1,1) + size(source_tri.X,1) + size(source_tri.X,1),1);
+out.J = zeros(size(var_array1,1) + size(source_tri.X,1) + size(source_tri.X,1),6*size(source_tri.X,1)); % the control points are duplicated [X0;X0]
+% out.F = zeros(size(var_array1,1),1);
+% out.J = zeros(size(var_array1,1),6*size(source_tri.X,1)); % the control points are duplicated [X0;X0]
 
