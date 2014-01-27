@@ -168,7 +168,7 @@ sag = 1:size(views.sagittal,3);
 cor = 1:size(views.coronal,3);
 
 global t
-t = 0:1/25:1;
+t = 0:1/5:1;
 
 
 global var_cell1
@@ -456,8 +456,8 @@ end
 
 %[A_c,b_c,Aeq_c,beq_c] = vert2lcon([var_array(:,1) var_array(:,2) var_array(:,3)]);
 
-show_results(new_im_ax); % show the lines in the frame coordinates
-show_results(new_im_sag); % show the lines in the frame coordinates
+%show_results(new_im_ax); % show the lines in the frame coordinates
+%show_results(new_im_sag); % show the lines in the frame coordinates
 
 tic
 %n_points = 1:length(t);%*size(vol_sag,3);
@@ -505,9 +505,9 @@ bb = [min(min(var_array(:,1))) max(max(var_array(:,1))); ...
       min(min(var_array(:,3))) max(max(var_array(:,3)))];
 
 % Create the source control points
-nx = 5;
-ny = 5;
-nz = 5;
+nx = 3;
+ny = 3;
+nz = 3;
 
 l_x = linspace(bb(1,1),bb(1,2),nx);
 l_y = linspace(bb(2,1),bb(2,2),ny);
@@ -627,16 +627,17 @@ tic
 %[sol,fval] = fminunc('myfun',tmp_mesh0,optimset('MaxIter', 400)); 
 
 %sol = lsqnonlin(@myfun2,[source_tri.X;source_tri.X],bb(:,1)-4,bb(:,2)+4);
-lbv = [-5 -5 -5];
-ubv = [5 5 5];
+lbv = [-10 -10 -10];
+ubv = [10 10 10];
 
 lb = repmat(lbv,2*size(source_tri.X,1),1) + [source_tri.X;source_tri.X];
 ub = repmat(ubv,2*size(source_tri.X,1),1) + [source_tri.X;source_tri.X];
 
 opts = optimset('Jacobian','on');
 [in out] = preparing;
-sol = lsqnonlin(@(t)myfun3(t,in,out),[source_tri.X;source_tri.X],[],[],opts);
-%sol = lsqnonlin(@myfun2,[source_tri.X;source_tri.X],lb,ub);
+%sol = lsqnonlin(@(t)myfun3(t,in,out),[source_tri.X;source_tri.X],[],[],opts);
+sol = lsqnonlin(@(t)myfun2(t,in,out),[source_tri.X;source_tri.X],lb,ub);
+
 tim = toc
 
 
