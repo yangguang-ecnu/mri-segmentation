@@ -63,18 +63,41 @@ b2c_ncoord2 = baryToCart(tri2, in.current_tr, in.c2b_coord);
 
  
  % Set the matrix to zero
- in.w1 = in.w1 - in.w1;
- 
+% in.w1 = in.w1 - in.w1;
+ in.w1(:,:) = 0;
  
  
  for i = 1:in.size_source
      
-     in.F(i + in.n) = in.lambda*(norm( in.source_tri.X(i,:) - mean(in.source_tri.X(in.list_edges{i},:)) ));
-     mean_tmp = mean(in.source_tri.X(in.list_edges{i},:));
+     out.F(i + in.n) = in.lambda*(norm( tri.X(i,:) - mean(tri.X(in.list_edges{i},:)) )).^2;
      
-     in.J(i + in.n,(i-1)*3 + 1:(i-1)*3 + 3) = [2*in.lambda*(in.source_tri.X(i,1) - mean_tmp(1) ) 2*in.lambda*(in.source_tri.X(i,2) - mean_tmp(2) ) 2*in.lambda*(in.source_tri.X(i,3) - mean_tmp(3) )];
-     in.J(i + in.n,(in.list_edges{i}-1)*3 + 1:(in.list_edges{i}-1)*3 + 3) = [in.scalar(i) in.scalar(i) in.scalar(i)];
+     mean_tmp = mean(tri.X(in.list_edges{i},:));
+     
+     out.J(i + in.n,(i-1)*3 + 1:(i-1)*3 + 3) = [2*in.lambda*(tri.X(i,1) - mean_tmp(1) ) 2*in.lambda*(tri.X(i,2) - mean_tmp(2) ) 2*in.lambda*(tri.X(i,3) - mean_tmp(3) )];
+     
+     for j = 1:length(in.list_edges{i})
+        out.J(i + in.n,(in.list_edges{i}(j)-1)*3 + 1:(in.list_edges{i}(j)-1)*3 + 3) = in.J(i + in.n,(i-1)*3 + 1:(i-1)*3 + 3).*[in.scalar(i) in.scalar(i) in.scalar(i)];
+     end
+ end
+ 
+ for i = in.size_source+1:2*in.size_source
+     
+     out.F(i + in.n) = in.lambda*(norm( tri2.X(i,:) - mean(tri2.X(in.list_edges{i-in.size_source},:)) )).^2;
+     
+     mean_tmp = mean(tri2.X(in.list_edges{i-in.size_source},:));
+     
+     out.J(i + in.n,(i-1)*3 + 1:(i-1)*3 + 3) = [2*in.lambda*(tri2.X(i,1) - mean_tmp(1) ) 2*in.lambda*(tri2.X(i,2) - mean_tmp(2) ) 2*in.lambda*(tri2.X(i,3) - mean_tmp(3) )];
+     
+     for j = 1:length(in.list_edges{i})
+         out.J(i + in.n,(in.list_edges{i-in.size_source}(j)-1)*3 + 1:(in.list_edges{i-in.size_source}(j)-1)*3 + 3) = in.J(i + in.n,(i-1)*3 + 1:(i-1)*3 + 3).*[in.scalar(i) in.scalar(i) in.scalar(i)];
+     end
+     
  end
  
  J = out.J;
  F = out.F;
+ 
+ out.J(:,:) = 0;
+ out.F(:,:) = 0;
+ out.J1(:,:) = 0;
+ out.J2(:,:) = 0;
