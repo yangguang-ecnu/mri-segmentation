@@ -7,6 +7,7 @@ tri2 = TriRep(in.source_tri.Triangulation,mesh0_X(size(in.source_tri.X,1)+1:end,
 b2c_ncoord1 = baryToCart(tri1, in.current_tr, in.c2b_coord);
 b2c_ncoord2 = baryToCart(tri2, in.current_tr, in.c2b_coord);
 
+incr = in.n + in.size_source;
 
  for i = 1:in.n  
      
@@ -28,7 +29,7 @@ b2c_ncoord2 = baryToCart(tri2, in.current_tr, in.c2b_coord);
 
             tmp_v1 = in.sag_m1{in.sub_2(i)} * [b2c_ncoord2(i,:) 1]'; % 3D point to 2D point in the frame coordinates var_cell{i,j,k}
             
-            
+            tmp_v = [tmp_v1(2) tmp_v1(1) tmp_v1(3)];
             %% Make sure the indexes are correct
             
             neig = [in.vol_sag(min(max(floor(tmp_v(2) + 1),1),in.rows),min(max(floor(tmp_v(1) + 1),1),in.cols),in.sub_2(i)) in.vol_sag(min(max(floor(tmp_v(2) + 1),1),in.rows),min(max(ceil(tmp_v(1) + 1),1),in.cols),in.sub_2(i));...
@@ -37,15 +38,15 @@ b2c_ncoord2 = baryToCart(tri2, in.current_tr, in.c2b_coord);
             
 
             %% Function
-             out.F(i) = new_im_ax - new_im_sag;
+            out.F(i) = new_im_ax - new_im_sag;
 
  end
  
 
  for i = 1:size(in.source_tri.X,1)
      
-     out.F(i + in.n) = in.lambda*(norm( in.source_tri.X(i,:) - mean(in.source_tri.X(in.list_edges{i},:)) ));
-     
+     out.F(i + in.n) = in.lambda*(sum( (tri1.X(i,:) - mean(tri2.X(in.list_edges{i},:))).^ 2 ));
+     out.F(i + incr) = in.lambda*(sum( (tri2.X(i,:) - mean(tri2.X(in.list_edges{i},:))).^ 2 ));
  end
 
  F = out.F;

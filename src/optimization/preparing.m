@@ -17,8 +17,10 @@ global list_edges
 % Define the input struct
 in.size_source = size(source_tri.X,1);
 
-in.w1 = zeros(3,3*size(source_tri.X,1));
-in.w2 = zeros(3,3*size(source_tri.X,1));
+in.w1 = zeros(4,3*size(source_tri.X,1));
+in.w2 = zeros(4,3*size(source_tri.X,1));
+in.w1(4,:) = 1;
+in.w2(4,:) = 1;
 
 in.rows = size(vol_ax,1);
 in.cols = size(vol_ax,2);
@@ -45,7 +47,7 @@ in.list_edges = list_edges;
 for i = 1:length(list_edges)
     in.scalar(i) = -1/length(list_edges{i});
 end
-in.lambda = .01;
+in.lambda = .001;
 
 
 % Define the output struct

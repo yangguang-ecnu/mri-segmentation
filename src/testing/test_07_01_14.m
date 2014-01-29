@@ -13,7 +13,7 @@ X_cor = [];
 Y_cor = [];
 Z_cor = [];
 
-disp('--------- Calculate M^(-1) and plane eq. for each slice in the first direction -----')
+
 %% Axial %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global vol_ax
 global vol_sag
@@ -30,8 +30,8 @@ vol_cor = views.coronal;
 new_im_ax = zeros(size(views.axial));
 new_im_sag = zeros(size(views.sagittal));
 
-rows = size(views.axial,1)
-cols = size(views.axial,2)
+rows = size(views.axial,1);
+cols = size(views.axial,2);
 
 total_ax = size(views.axial,3);
 total_sag = size(views.sagittal,3);
@@ -51,13 +51,32 @@ global axial_m1
 axial_m = cell(1,total_ax);
 axial_m1 = cell(1,total_ax);
 
-M = zeros(4,4);
+disp('--------- Image denoising -----')
+%% Image denoising %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+for i=1:total_ax
+    vol_ax(:,:,i) = anisodiff2D(views.axial(:,:,i), 10, 1/7, 20, 1); 
+end
+
+for i=1:total_sag
+    vol_sag(:,:,i) = anisodiff2D(views.sagittal(:,:,i), 10, 1/7, 20, 1); 
+end
+for i=1:total_cor
+    vol_cor(:,:,i) = anisodiff2D(views.coronal(:,:,i), 10, 1/7, 20, 1); 
+end
+
+
+disp('--------- Calculate M^(-1) and plane eq. for each slice in the first direction -----')
+M = zeros(4,3);
 
 for ax=1:size(views.axial,3)
     
     
-    M(1:3,4) = views.axial_info{ax}.ImagePositionPatient;
-    M(4,4) = 1;
+%     M(1:3,4) = views.axial_info{ax}.ImagePositionPatient;
+%     M(4,4) = 1;
+%     M(1:3,1) = views.axial_info{ax}.ImageOrientationPatient(1:3).*views.axial_info{ax}.PixelSpacing(1);
+%     M(1:3,2) = views.axial_info{ax}.ImageOrientationPatient(4:6).*views.axial_info{ax}.PixelSpacing(2);
+    M(1:3,3) = views.axial_info{ax}.ImagePositionPatient;
+    M(4,3) = 1;
     M(1:3,1) = views.axial_info{ax}.ImageOrientationPatient(1:3).*views.axial_info{ax}.PixelSpacing(1);
     M(1:3,2) = views.axial_info{ax}.ImageOrientationPatient(4:6).*views.axial_info{ax}.PixelSpacing(2);
     
@@ -94,11 +113,14 @@ sag_m1 = cell(1,total_sag);
 for sag=1:size(views.sagittal,3)
     
     
-    M(1:3,4) = views.sagittal_info{sag}.ImagePositionPatient;
-    M(4,4) = 1;
+%     M(1:3,4) = views.sagittal_info{sag}.ImagePositionPatient;
+%     M(4,4) = 1;
+%     M(1:3,1) = views.sagittal_info{sag}.ImageOrientationPatient(1:3).*views.sagittal_info{sag}.PixelSpacing(1);
+%     M(1:3,2) = views.sagittal_info{sag}.ImageOrientationPatient(4:6).*views.sagittal_info{sag}.PixelSpacing(2);
+    M(1:3,3) = views.sagittal_info{sag}.ImagePositionPatient;
+    M(4,3) = 1;
     M(1:3,1) = views.sagittal_info{sag}.ImageOrientationPatient(1:3).*views.sagittal_info{sag}.PixelSpacing(1);
     M(1:3,2) = views.sagittal_info{sag}.ImageOrientationPatient(4:6).*views.sagittal_info{sag}.PixelSpacing(2);
-    
     sag_m{sag} = M;
     sag_m1{sag} = pinv(M);
     
@@ -132,11 +154,14 @@ cor_m1 = cell(1,total_cor);
 for cor=1:size(views.coronal,3)
     
     
-    M(1:3,4) = views.coronal_info{cor}.ImagePositionPatient;
-    M(4,4) = 1;
+%     M(1:3,4) = views.coronal_info{cor}.ImagePositionPatient;
+%     M(4,4) = 1;
+%     M(1:3,1) = views.coronal_info{cor}.ImageOrientationPatient(1:3).*views.coronal_info{cor}.PixelSpacing(1);
+%     M(1:3,2) = views.coronal_info{cor}.ImageOrientationPatient(4:6).*views.coronal_info{cor}.PixelSpacing(2);
+    M(1:3,3) = views.coronal_info{cor}.ImagePositionPatient;
+    M(4,3) = 1;
     M(1:3,1) = views.coronal_info{cor}.ImageOrientationPatient(1:3).*views.coronal_info{cor}.PixelSpacing(1);
     M(1:3,2) = views.coronal_info{cor}.ImageOrientationPatient(4:6).*views.coronal_info{cor}.PixelSpacing(2);
-    
     cor_m{cor} = M;
     cor_m1{cor} = pinv(M);
     
@@ -168,7 +193,7 @@ sag = 1:size(views.sagittal,3);
 cor = 1:size(views.coronal,3);
 
 global t
-t = 0:1/5:1;
+t = 0:1/15:1;
 
 
 global var_cell1
@@ -223,6 +248,7 @@ for i=1:length(ax)
 
             %% axial %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             tmp_v1 = axial_m1{i} * [var_cell1{i,j,k} 1]'; % 3D point to 2D point in the frame coordinates
+            %tmp_v1 = axial_m1{i} * var_cell1{i,j,k}'; 
             
             tmp_v = [tmp_v1(2) tmp_v1(1) tmp_v1(3)]; % switch the first and second coordinates, to have i',j' (rows,cols)
             
@@ -232,15 +258,15 @@ for i=1:length(ax)
             
             %% Make sure the indexes are correct and use bilinear interpolation
             
-            neig = [views.axial(max(floor(tmp_v(1) + 1),1),max(floor(tmp_v(2) + 1),1),i) views.axial(max(floor(tmp_v(1) + 1),1),min(ceil(tmp_v(2) + 1),cols),i);...
-                    views.axial(min(ceil(tmp_v(1) + 1),rows), max(floor(tmp_v(2) + 1),1),i) views.axial(min(ceil(tmp_v(1) + 1),rows), min(ceil(tmp_v(2) + 1),cols),i)];
+            neig = [vol_ax(max(floor(tmp_v(1) + 1),1),max(floor(tmp_v(2) + 1),1),i)    vol_ax(max(floor(tmp_v(1) + 1),1),min(ceil(tmp_v(2) + 1),cols),i);...
+                    vol_ax(min(ceil(tmp_v(1) + 1),rows), max(floor(tmp_v(2) + 1),1),i) vol_ax(min(ceil(tmp_v(1) + 1),rows), min(ceil(tmp_v(2) + 1),cols),i)];
                 
             new_im_ax(new_i,new_j,new_k) = bilinear_interpolation(tmp_v(1),tmp_v(2),double(neig));
                                                 
             diff1 = new_im_ax(new_i,new_j,new_k);
             %% sagittal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             tmp_v1 = sag_m1{j} * [var_cell1{i,j,k} 1]'; % 3D point to 2D point in the frame coordinates
-            
+            %tmp_v1 = sag_m1{j} * var_cell1{i,j,k}';
             tmp_v = [tmp_v1(2) tmp_v1(1) tmp_v1(3)]; % switch the first and second coordinates, to have i',j' (rows,cols)
 
             new_i = round(tmp_v(1) + 1); % matlab starts always at 1
@@ -249,8 +275,8 @@ for i=1:length(ax)
             
             %% Make sure the indexes are correct
             
-            neig = [views.sagittal(max(floor(tmp_v(1) + 1),1),max(floor(tmp_v(2) + 1),1),j) views.sagittal(max(floor(tmp_v(1) + 1),1),min(ceil(tmp_v(2) + 1),cols),j);...
-                    views.sagittal(min(ceil(tmp_v(1) + 1),rows), max(floor(tmp_v(2) + 1),1),j) views.sagittal(min(ceil(tmp_v(1) + 1),rows), min(ceil(tmp_v(2) + 1),cols),j)];
+            neig = [vol_sag(max(floor(tmp_v(1) + 1),1),max(floor(tmp_v(2) + 1),1),j)    vol_sag(max(floor(tmp_v(1) + 1),1),min(ceil(tmp_v(2) + 1),cols),j);...
+                    vol_sag(min(ceil(tmp_v(1) + 1),rows), max(floor(tmp_v(2) + 1),1),j) vol_sag(min(ceil(tmp_v(1) + 1),rows), min(ceil(tmp_v(2) + 1),cols),j)];
                 
             new_im_sag(new_i,new_j,new_k) = bilinear_interpolation(tmp_v(1),tmp_v(2),double(neig));
             
@@ -279,6 +305,7 @@ var_array2 = zeros(size(views.axial,3)*size(views.coronal,3)*length(t),3);
 
 options = optimset('Display','off');
 
+figure;
 for i=1:length(ax)
 	
     for j=1:length(cor)
@@ -301,17 +328,17 @@ for i=1:length(ax)
 
         [V1,nr,nre] = qlcon2vert(x0, A, b, Aeq, beq); % given the constraints and  a solution, determine the vertices, the intersection points !!
 
-        % plot3(V1(:,1),V1(:,2),V1(:,3),'g*');hold on
+        plot3(V1(:,1),V1(:,2),V1(:,3),'g*');hold on
 
-        % a = line(V1(:,1),V1(:,2),V1(:,3));
-        % line([V1(1,1) V1(1,2) V1(1,3)], [V1(2,1),V1(2,2),V1(2,3)], 'g')
+        %a = line(V1(:,1),V1(:,2),V1(:,3));
+        %line([V1(1,1) V1(1,2) V1(1,3)], [V1(2,1),V1(2,2),V1(2,3)], 'g')
 
         
         vd = - [V1(1,1),V1(1,2),V1(1,3)] + [V1(2,1),V1(2,2),V1(2,3)];
 
         for k=1:length(t)
             
-            % plot3(V1(1,1) + vd(1)*t(k),V1(1,2) + vd(2)*t(k),V1(1,3) + vd(3)*t(k),'g+');%,'MarkerSize',i);hold on
+            plot3(V1(1,1) + vd(1)*t(k),V1(1,2) + vd(2)*t(k),V1(1,3) + vd(3)*t(k),'g+');%,'MarkerSize',i);hold on
             var_cell2{i,j,k} = [V1(1,1) + vd(1)*t(k) V1(1,2) + vd(2)*t(k) V1(1,3) + vd(3)*t(k)]; %% the intersection points
             
             ind_tmp = sub2ind([size(var_cell2,3) size(var_cell2,2) size(var_cell2,1)],k,j,i);
@@ -357,6 +384,13 @@ for i=1:length(ax)
        
     end
 end
+
+
+fill3(X_ax(:,1),Y_ax(:,1),Z_ax(:,1),'r');hold on % first axial plane
+fill3(X_ax(:,total_ax),Y_ax(:,total_ax),Z_ax(:,total_ax),'r');hold on % first axial plane
+fill3(X_cor(:,1),Y_cor(:,1),Z_cor(:,1),'b');hold on % first sagittal plane
+fill3(X_cor(:,total_cor),Y_cor(:,total_cor),Z_cor(:,total_cor),'b');hold on % second sagittal plane 
+alpha(.2)
 disp('--------- Calculate the s2 x s3 intersections between planes of the 2 given directions -----')
 %% Intersections Axial & Sagittal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -372,7 +406,7 @@ var_cell3 = cell(size(views.coronal,3),size(views.sagittal,3),length(t));
 var_array3 = zeros(size(views.coronal,3)*size(views.sagittal,3)*length(t),3);
 
 options = optimset('Display','off');
-
+figure;
 for i=1:length(cor)
 	
     for j=1:length(sag)
@@ -397,7 +431,7 @@ for i=1:length(cor)
 
         [V1,nr,nre] = qlcon2vert(x0, A, b, Aeq, beq); % given the constraints and  a solution, determine the vertices, the intersection points !!
 
-        % plot3(V1(:,1),V1(:,2),V1(:,3),'g*');hold on
+        plot3(V1(:,1),V1(:,2),V1(:,3),'g*');hold on
 
         % a = line(V1(:,1),V1(:,2),V1(:,3));
         % line([V1(1,1) V1(1,2) V1(1,3)], [V1(2,1),V1(2,2),V1(2,3)], 'g')
@@ -407,7 +441,7 @@ for i=1:length(cor)
 
         for k=1:length(t)
             
-            % plot3(V1(1,1) + vd(1)*t(k),V1(1,2) + vd(2)*t(k),V1(1,3) + vd(3)*t(k),'g+');%,'MarkerSize',i);hold on
+            plot3(V1(1,1) + vd(1)*t(k),V1(1,2) + vd(2)*t(k),V1(1,3) + vd(3)*t(k),'g+');%,'MarkerSize',i);hold on
             var_cell3{i,j,k} = [V1(1,1) + vd(1)*t(k) V1(1,2) + vd(2)*t(k) V1(1,3) + vd(3)*t(k)]; %% the intersection points
             
             ind_tmp = sub2ind([size(var_cell3,3) size(var_cell3,2) size(var_cell3,1)],k,j,i);
@@ -453,24 +487,28 @@ for i=1:length(cor)
        
     end
 end
-
+fill3(X_cor(:,1),Y_cor(:,1),Z_cor(:,1),'r');hold on % first sagittal plane
+fill3(X_cor(:,total_cor),Y_cor(:,total_cor),Z_cor(:,total_cor),'r');hold on % second sagittal plane 
+fill3(X_sag(:,1),Y_sag(:,1),Z_sag(:,1),'b');hold on % first sagittal plane
+fill3(X_sag(:,total_sag),Y_sag(:,total_sag),Z_sag(:,total_sag),'b');hold on % second sagittal plane 
+alpha(.2)
 %[A_c,b_c,Aeq_c,beq_c] = vert2lcon([var_array(:,1) var_array(:,2) var_array(:,3)]);
 
 %show_results(new_im_ax); % show the lines in the frame coordinates
 %show_results(new_im_sag); % show the lines in the frame coordinates
 
 tic
-%n_points = 1:length(t);%*size(vol_sag,3);
+n_points = 1:length(t);%*size(vol_sag,3);
 
 %[sol,fval] = fminunc(@myfun,var_array(n_points,:));
 %[sol,fval] = fminunc(@myfun,ones(size(vol_sag,3)*length(t)*2,3));
 
 %% Prepare the constraints
-% cons_Aeq(1:length(n_points),:) = repmat(plane_ax(1,1:3),length(n_points),1);
-% cons_beq(1:length(n_points),:) = repmat(plane_ax(1,4),length(n_points),1);
-% 
-% cons_Aeq(1+length(n_points):2*length(n_points),:) = repmat(plane_sag(1,1:3),length(n_points),1);
-% cons_beq(1+length(n_points):2*length(n_points),:) = repmat(plane_sag(1,4),length(n_points),1);
+cons_Aeq(1:length(n_points),:) = repmat(plane_ax(1,1:3),length(n_points),1);
+cons_beq(1:length(n_points),:) = repmat(plane_ax(1,4),length(n_points),1);
+
+cons_Aeq(1+length(n_points):2*length(n_points),:) = repmat(plane_sag(1,1:3),length(n_points),1);
+cons_beq(1+length(n_points):2*length(n_points),:) = repmat(plane_sag(1,4), length(n_points),1);
 
 %[sol,fval] = fmincon(@myfun,[var_array(n_points,:)' var_array(n_points,:)']',cons_Aeq,cons_beq);
 
@@ -484,12 +522,12 @@ tic
 % end
 
 %% Plot the planes
-
+figure;
 fill3(X_ax(:,1),Y_ax(:,1),Z_ax(:,1),'r');hold on % first axial plane
 fill3(X_ax(:,total_ax),Y_ax(:,total_ax),Z_ax(:,total_ax),'r');hold on % first axial plane
 fill3(X_sag(:,1),Y_sag(:,1),Z_sag(:,1),'b');hold on % first sagittal plane
 fill3(X_sag(:,total_sag),Y_sag(:,total_sag),Z_sag(:,total_sag),'b');hold on % second sagittal plane    
-
+alpha(.2)
 time = toc;
 
 disp('--------- Calculate the source control points ( # N^3 ) -----')
@@ -624,9 +662,7 @@ global c2b_coord
 current_tr = tsearchn(source_tri.X,source_tri.Triangulation,[var_array1(:,1) var_array1(:,2) var_array1(:,3)]); % in our case it is a scalar, to make it general we consider current_tr as an array
 c2b_coord = cartToBary(source_tri,current_tr,[var_array1(:,1) var_array1(:,2) var_array1(:,3)]); % barycentric coordinates of the points wrt source tri
 tic
-%[sol,fval] = fminunc('myfun',tmp_mesh0,optimset('MaxIter', 400)); 
 
-%sol = lsqnonlin(@myfun2,[source_tri.X;source_tri.X],bb(:,1)-4,bb(:,2)+4);
 lbv = [-10 -10 -10];
 ubv = [10 10 10];
 
@@ -634,9 +670,11 @@ lb = repmat(lbv,2*size(source_tri.X,1),1) + [source_tri.X;source_tri.X];
 ub = repmat(ubv,2*size(source_tri.X,1),1) + [source_tri.X;source_tri.X];
 
 opts = optimset('Jacobian','on');
+
 [in out] = preparing;
-%sol = lsqnonlin(@(t)myfun3(t,in,out),[source_tri.X;source_tri.X],[],[],opts);
-sol = lsqnonlin(@(t)myfun2(t,in,out),[source_tri.X;source_tri.X],lb,ub);
+
+%[xfinal fval exitflag output] = lsqnonlin(@(t)myfun3(t,in,out),[source_tri.X;source_tri.X],[],[],opts);
+[xfinal fval exitflag output] = lsqnonlin(@(t)myfun2(t,in,out),[source_tri.X;source_tri.X],lb,ub);
 
 tim = toc
 

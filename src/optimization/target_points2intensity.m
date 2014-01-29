@@ -6,12 +6,13 @@
 %% Answer: with barycentric coordinates
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clc;
+%clc;
 %close all;
 
 global source_tri
 global var_array1
 global axial_m1
+global sag_m1
 global var_cell1
 global vol_ax
 global vol_sag
@@ -54,52 +55,38 @@ for i = 1:size(var_array1,1)
     [sub_tmp1 sub_tmp2 sub_tmp3] = ind2sub([size(var_cell1,3) size(var_cell1,2) size(var_cell1,1)],i);
     
     tmp_v1 = axial_m1{sub_tmp3} * [xc(i,:) 1]'; % 3D point to 2D point in the frame coordinates
-
+    %tmp_v1 = axial_m1{sub_tmp3} * xc(i,:)';
     tmp_v = [tmp_v1(2) tmp_v1(1) tmp_v1(3)]; % switch the first and second coordinates, to have i',j' (rows,cols)
-    
-%     sub_tmp3
-%     min(max(floor(tmp_v(1) + 1),1),rows)
-%     min(max(floor(tmp_v(2) + 1),1),512)
-%     views.axial(min(max(floor(tmp_v(1) + 1),1),rows),min(max(floor(tmp_v(2) + 1),1),cols),sub_tmp3)
     
     %% Make sure the indexes are correct and use bilinear interpolation
 
-    neig = [views.axial(min(max(floor(tmp_v(1) + 1),1),rows),min(max(floor(tmp_v(2) + 1),1),cols),sub_tmp3) views.axial(min(max(floor(tmp_v(1) + 1),1),rows),min(max(ceil(tmp_v(2) + 1),1),cols),sub_tmp3);...
-            views.axial(min(max(ceil(tmp_v(1) + 1),1),rows), min(max(floor(tmp_v(2) + 1),1),cols),sub_tmp3) views.axial(min(max(ceil(tmp_v(1) + 1),1),rows), min(max(ceil(tmp_v(2) + 1),1),cols),sub_tmp3)];
-%     s1 = bilinear_interpolation(tmp_v(1),tmp_v(2),double(neig));
-%         
-%     opt_im_ax(min(max(round(tmp_v(1) + 1),1),rows),min(max(round(tmp_v(2) + 1),1),cols),sub_tmp3) = s1;
+    neig = [vol_ax(min(max(floor(tmp_v(1) + 1),1),rows),min(max(floor(tmp_v(2) + 1),1),cols),sub_tmp3) vol_ax(min(max(floor(tmp_v(1) + 1),1),rows),min(max(ceil(tmp_v(2) + 1),1),cols),sub_tmp3);...
+            vol_ax(min(max(ceil(tmp_v(1) + 1),1),rows), min(max(floor(tmp_v(2) + 1),1),cols),sub_tmp3) vol_ax(min(max(ceil(tmp_v(1) + 1),1),rows), min(max(ceil(tmp_v(2) + 1),1),cols),sub_tmp3)];
+
 
     new_i = min(max(floor(tmp_v(1) + 1),1),rows);%round(tmp_v(1) + 1) % matlab starts always at 1
     new_j = min(max(floor(tmp_v(2) + 1),1),cols);%round(tmp_v(2) + 1) % matlab starts always at 1
     new_k = sub_tmp3;
-
-%     neig = [views.axial(max(floor(tmp_v(1) + 1),1),max(floor(tmp_v(2) + 1),1),sub_tmp3) views.axial(max(floor(tmp_v(1) + 1),1),min(ceil(tmp_v(2) + 1),cols),sub_tmp3);...
-%         views.axial(min(ceil(tmp_v(1) + 1),rows), max(floor(tmp_v(2) + 1),1),sub_tmp3) views.axial(min(ceil(tmp_v(1) + 1),rows), min(ceil(tmp_v(2) + 1),cols),sub_tmp3)];
 
     opt_im_ax(new_i,new_j,new_k) = bilinear_interpolation(tmp_v(1),tmp_v(2),double(neig));
     aa = opt_im_ax(new_i,new_j,new_k);
     %% sagittal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     tmp_v1 = sag_m1{sub_tmp2} * [xc2(i,:) 1]'; % 3D point to 2D point in the frame coordinates var_cell{i,j,k}
-    
+    %tmp_v1 = sag_m1{sub_tmp2} * xc2(i,:)';
     tmp_v = [tmp_v1(2) tmp_v1(1) tmp_v1(3)]; % switch the first and second coordinates, to have i',j' (rows,cols)
     
     %% Make sure the indexes are correct
     
-    neig = [views.sagittal(min(max(floor(tmp_v(1) + 1),1),rows),min(max(floor(tmp_v(2) + 1),1),cols),sub_2(i)) views.sagittal(min(max(floor(tmp_v(1) + 1),1),rows),min(max(ceil(tmp_v(2) + 1),1),cols),sub_2(i));...
-            views.sagittal(min(max(ceil(tmp_v(1) + 1),1),rows), min(max(floor(tmp_v(2) + 1),1),cols),sub_2(i)) views.sagittal(min(max(ceil(tmp_v(1) + 1),1),rows), min(max(ceil(tmp_v(2) + 1),1),cols),sub_2(i))];
-%     s2 = bilinear_interpolation(tmp_v(1),tmp_v(2),double(neig));
-%     
-%     opt_im_sag(round(tmp_v1(2)+1),round(tmp_v1(1)+1),sub_2(i)) = s2;
+    neig = [vol_sag(min(max(floor(tmp_v(1) + 1),1),rows),min(max(floor(tmp_v(2) + 1),1),cols),sub_2(i)) vol_sag(min(max(floor(tmp_v(1) + 1),1),rows),min(max(ceil(tmp_v(2) + 1),1),cols),sub_2(i));...
+            vol_sag(min(max(ceil(tmp_v(1) + 1),1),rows), min(max(floor(tmp_v(2) + 1),1),cols),sub_2(i)) vol_sag(min(max(ceil(tmp_v(1) + 1),1),rows), min(max(ceil(tmp_v(2) + 1),1),cols),sub_2(i))];
+
     new_i = round(tmp_v(1) + 1); % matlab starts always at 1
     new_j = round(tmp_v(2) + 1); % matlab starts always at 1
     new_k = sub_tmp2;
 
     %% Make sure the indexes are correct
 
-%     neig = [views.sagittal(max(floor(tmp_v(1) + 1),1),max(floor(tmp_v(2) + 1),1),sub_tmp2) views.sagittal(max(floor(tmp_v(1) + 1),1),min(ceil(tmp_v(2) + 1),cols),sub_tmp2);...
-%         views.sagittal(min(ceil(tmp_v(1) + 1),rows), max(floor(tmp_v(2) + 1),1),sub_tmp2) views.sagittal(min(ceil(tmp_v(1) + 1),rows), min(ceil(tmp_v(2) + 1),cols),sub_tmp2)];
     opt_im_sag(new_i,new_j,new_k) = bilinear_interpolation(tmp_v(1),tmp_v(2),double(neig));
     s(i) = abs(opt_im_sag(new_i,new_j,new_k) - aa);
 end 
@@ -109,12 +96,31 @@ std(s)
 %show_results(opt_im_ax);
 %show_results(opt_im_sag);
 % Plot the deformed triangulation and mapped locations of the reference points.
-subplot(1,2,2);
+subplot(1,2,2);title('Second mesh'); 
 tetramesh(target_tri2); 
 alpha(.1)
 hold on;
-
 plot3(xc2(:,1), xc2(:,2), xc2(:,3), '*r'); 
-
 hold off;
 axis equal;
+
+%% Plot the original triangulation and reference points.
+figure;
+subplot(1,2,1);
+tetramesh(source_tri); hold on;
+alpha(.1)
+plot3(var_array1(:,1), var_array1(:,2),var_array1(:,3),'*r'); 
+hold off;
+axis equal;
+
+subplot(1,2,2);
+tetramesh(target_tri);title('First mesh'); 
+alpha(.1)
+hold on;
+plot3(xc(:,1), xc(:,2), xc(:,3), '*r'); 
+hold off;
+axis equal;
+
+varlist = {'new_k','new_j','new_i','neig','sub_tmp1','sub_tmp2','sub_tmp3','tmp_v1','tmp_v','aa'};
+clear(varlist{:})
+clear varlist
