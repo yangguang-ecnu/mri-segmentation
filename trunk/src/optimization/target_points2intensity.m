@@ -36,8 +36,8 @@ axis equal;
 
 % target_tri = TriRep(tri,source_tri.X(:,1), 3.*source_tri.X(:,2), 10 + source_tri.X(:,3));
 % target_tri = TriRep(tri,noise_data(:,1),noise_data(:,2),noise_data(:,3));
-target_tri  = TriRep(source_tri.Triangulation,sol(1:size(sol,1)/2,:));
-target_tri2 = TriRep(source_tri.Triangulation,sol(size(sol,1)/2+1:end,:));
+target_tri  = TriRep(source_tri.Triangulation,xfinal(1:size(xfinal,1)/2,:));
+target_tri2 = TriRep(source_tri.Triangulation,xfinal(size(xfinal,1)/2+1:end,:));
 
 current_tr = tsearchn(source_tri.X,source_tri.Triangulation,[var_array1(:,1) var_array1(:,2) var_array1(:,3)]); % in our case it is a scalar, to make it general we consider current_tr as an array
 
@@ -93,11 +93,11 @@ end
 
 mean(s)
 std(s)
-%show_results(opt_im_ax);
-%show_results(opt_im_sag);
+show_results(opt_im_ax);
+show_results(opt_im_sag);
 % Plot the deformed triangulation and mapped locations of the reference points.
-subplot(1,2,2);title('Second mesh'); 
-tetramesh(target_tri2); 
+subplot(1,2,2);
+tetramesh(target_tri2);title('Second mesh');  
 alpha(.1)
 hold on;
 plot3(xc2(:,1), xc2(:,2), xc2(:,3), '*r'); 
