@@ -1,35 +1,35 @@
-function varargout = viewer3d(varargin)
-% VIEWER3D MATLAB code for viewer3d.fig
-%      VIEWER3D, by itself, creates a new VIEWER3D or raises the existing
+function varargout = view3d(varargin)
+% VIEW3D MATLAB code for view3d.fig
+%      VIEW3D, by itself, creates a new VIEW3D or raises the existing
 %      singleton*.
 %
-%      H = VIEWER3D returns the handle to a new VIEWER3D or the handle to
+%      H = VIEW3D returns the handle to a new VIEW3D or the handle to
 %      the existing singleton*.
 %
-%      VIEWER3D('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in VIEWER3D.M with the given input arguments.
+%      VIEW3D('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in VIEW3D.M with the given input arguments.
 %
-%      VIEWER3D('Property','Value',...) creates a new VIEWER3D or raises the
+%      VIEW3D('Property','Value',...) creates a new VIEW3D or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before viewer3d_OpeningFcn gets called.  An
+%      applied to the GUI before view3d_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to viewer3d_OpeningFcn via varargin.
+%      stop.  All inputs are passed to view3d_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help viewer3d
+% Edit the above text to modify the response to help view3d
 
-% Last Modified by GUIDE v2.5 08-Nov-2013 10:59:53
+% Last Modified by GUIDE v2.5 07-Feb-2014 12:52:43
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @viewer3d_OpeningFcn, ...
-                   'gui_OutputFcn',  @viewer3d_OutputFcn, ...
+                   'gui_OpeningFcn', @view3d_OpeningFcn, ...
+                   'gui_OutputFcn',  @view3d_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,17 +44,17 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before viewer3d is made visible.
-function viewer3d_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before view3d is made visible.
+function view3d_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to viewer3d (see VARARGIN)
+% varargin   command line arguments to view3d (see VARARGIN)
 
 %handles.orient = imread('resources/orient2.png');
 
-% Choose default command line output for viewer3d
+% Choose default command line output for view3d
 handles.output = hObject;
 
 handles.views = varargin{1};
@@ -124,12 +124,12 @@ imshow(imread('pictures/icon/logo.png'),[]);
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes viewer3d wait for user response (see UIRESUME)
+% UIWAIT makes view3d wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = viewer3d_OutputFcn(hObject, eventdata, handles) 
+function varargout = view3d_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -153,6 +153,18 @@ handles.view3d = 1;
 axes(handles.axes_3dview);
 axis on
 cla
+
+if ~isempty(handles.triangulation)
+    %for i = 1:length(handles.triangulation)
+    i = 1;
+    trisurf(handles.triangulation(i).faces,handles.triangulation(i).vertices(:,1),handles.triangulation(i).vertices(:,2),handles.triangulation(i).vertices(:,3),'facecolor','c','edgecolor','none','facelighting','flat');camlight;hold on
+    alpha(.2)
+    i = 2;
+    trisurf(handles.triangulation(i).faces,handles.triangulation(i).vertices(:,1),handles.triangulation(i).vertices(:,2),handles.triangulation(i).vertices(:,3),'facecolor','b','edgecolor','none','facelighting','flat');camlight;hold on
+
+    %end
+    
+end
 
 
 %% Axial %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -199,9 +211,7 @@ hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
 
 axis equal
 
-if ~isempty(handles.triangulation)
-    trisurf(handles.triangulation.faces,handles.triangulation.vertices(:,1),handles.triangulation.vertices(:,2),handles.triangulation.vertices(:,3),'facecolor','c','edgecolor','none','facelighting','flat');camlight
-end
+
 
 view(3)
 
