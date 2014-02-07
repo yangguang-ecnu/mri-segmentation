@@ -9,38 +9,100 @@ end
 %% Start the optimization %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 disp('--------- Start Optimization  -----')
 
-size1 = size(var_cell1,3);
-size2 = size(var_cell1,2);
-size3 = size(var_cell1,1);
+global source_tri
+global var_array1
+global var_cell1
+global var_array2
+global var_cell2
+global var_array3
+global var_cell3
 
-global sub_1
-global sub_2
-global sub_3
-global current_tr
-global c2b_coord
+disp('--------- Preparing first intersection: axial/sagittal  -----')
+size1_int1 = size(var_cell1,3);
+size2_int1 = size(var_cell1,2);
+size3_int1 = size(var_cell1,1);
 
-[sub_1, sub_2, sub_3] = ind2sub([size1 size2 size3],1:size(var_array1,1));
-current_tr = tsearchn(source_tri.X,source_tri.Triangulation,[var_array1(:,1) var_array1(:,2) var_array1(:,3)]); % in our case it is a scalar, to make it general we consider current_tr as an array
-c2b_coord = cartToBary(source_tri,current_tr,[var_array1(:,1) var_array1(:,2) var_array1(:,3)]); % barycentric coordinates of the points wrt source tri
+global sub_1_int1
+global sub_2_int1
+global sub_3_int1
+global current_tr_int1
+global c2b_coord_int1
+
+
+[sub_1_int1, sub_2_int1, sub_3_int1] = ind2sub([size1_int1 size2_int1 size3_int1],1:size(var_array1,1));
+current_tr_int1 = tsearchn(source_tri.X,source_tri.Triangulation,[var_array1(:,1) var_array1(:,2) var_array1(:,3)]); % in our case it is a scalar, to make it general we consider current_tr as an array
+c2b_coord_int1  = cartToBary(source_tri,current_tr_int1,[var_array1(:,1) var_array1(:,2) var_array1(:,3)]); % barycentric coordinates of the points wrt source tri
+
+disp('--------- Preparing second intersection: axial/coronal  -----')
+size1_int2 = size(var_cell2,3);
+size2_int2 = size(var_cell2,2);
+size3_int2 = size(var_cell2,1);
+
+global sub_1_int2
+global sub_2_int2
+global sub_3_int2
+global current_tr_int2
+global c2b_coord_int2
+
+
+[sub_1_int2, sub_2_int2, sub_3_int2] = ind2sub([size1_int2 size2_int2 size3_int2],1:size(var_array2,1));
+current_tr_int2 = tsearchn(source_tri.X,source_tri.Triangulation,[var_array2(:,1) var_array2(:,2) var_array2(:,3)]); % in our case it is a scalar, to make it general we consider current_tr as an array
+c2b_coord_int2  = cartToBary(source_tri,current_tr_int2,[var_array2(:,1) var_array2(:,2) var_array2(:,3)]); % barycentric coordinates of the points wrt source tri
+
+
+disp('--------- Preparing third intersection: sagittal/coronal  -----')
+size1_int3 = size(var_cell3,3);
+size2_int3 = size(var_cell3,2);
+size3_int3 = size(var_cell3,1);
+
+global sub_1_int3
+global sub_2_int3
+global sub_3_int3
+global current_tr_int3
+global c2b_coord_int3
+
+
+[sub_1_int3, sub_2_int3, sub_3_int3] = ind2sub([size1_int3 size2_int3 size3_int3],1:size(var_array3,1));
+current_tr_int3 = tsearchn(source_tri.X,source_tri.Triangulation,[var_array3(:,1) var_array3(:,2) var_array3(:,3)]); % in our case it is a scalar, to make it general we consider current_tr as an array
+c2b_coord_int3  = cartToBary(source_tri,current_tr_int3,[var_array3(:,1) var_array3(:,2) var_array3(:,3)]); % barycentric coordinates of the points wrt source tri
 
 
 lbv = [-20 -20 -20];
-ubv = [20 20 20];
+ubv = [ 20  20  20];
 
-lb = repmat(lbv,2*size(source_tri.X,1),1) + [source_tri.X;source_tri.X];
-ub = repmat(ubv,2*size(source_tri.X,1),1) + [source_tri.X;source_tri.X];
-% lb = [];
-% ub = [];
+% lb = repmat(lbv,2*size(source_tri.X,1),1) + [source_tri.X;source_tri.X];
+% ub = repmat(ubv,2*size(source_tri.X,1),1) + [source_tri.X;source_tri.X];
+lb = [];
+ub = [];
 
 opts = optimset('Jacobian','on','Display','iter','MaxIter', 20);
 
 tic
 [in out] = preparing;
+
 tim = toc
 
 tic
+%% initialization
+mesh0 = [source_tri.X(:,1:2);source_tri.X(:,2:3);source_tri.X(:,1) source_tri.X(:,3)]; % [source_tri.X(:,1:2);source_tri.X(:,2:3)]
+
 % [xfinal fval exitflag output] = lsqnonlin(@(t)myfun4(t,in),[source_tri.X;source_tri.X],lb,ub,opts);
-[xfinal fval exitflag output] = lsqnonlin(@(t)myfun5(t,in,out),[source_tri.X;source_tri.X],lb,ub,optimset('Display','iter','MaxIter', 20));
+% [xfinal fval exitflag output] = lsqnonlin(@(t)myfun5(t,in,out),[source_tri.X;source_tri.X],lb,ub,optimset('Display','iter','MaxIter', 40));
+% [xfinal fval exitflag output] = fminunc(@myfun_unc,[source_tri.X;source_tri.X],optimset('Display','iter','MaxIter', 40));
+% [xfinal_tmp fval exitflag output] = fminunc(@myfun_unc_ortho, mesh0, optimset('Display','iter','MaxIter', 40));
+options = optimset('Display','iter','MaxIter', 40);
+[xfinal_tmp fval exitflag output] = fminunc(@myfun_unc_ortho, mesh0,optimset('Jacobian','on','Display','iter'));
+
+xfinal(1:size(source_tri.X,1),:) = [xfinal_tmp(1:size(source_tri.X,1),:) source_tri.X(:,3)];
+xfinal(1+size(source_tri.X,1):2*size(source_tri.X,1),:) = [source_tri.X(:,1) xfinal_tmp(1+size(source_tri.X,1):2*size(source_tri.X,1),:)];
+xfinal(1+2*size(source_tri.X,1):3*size(source_tri.X,1),:) = [ xfinal_tmp(1+2*size(source_tri.X,1):3*size(source_tri.X,1),1) source_tri.X(:,2) xfinal_tmp(1+2*size(source_tri.X,1):3*size(source_tri.X,1),2)];
+
+%% Define the initial mesh as a vector
+% mesh_vector_tmp = [source_tri.X;source_tri.X]';
+% mesh_vector = mesh_vector_tmp(:);
+% 
+% [xfinal_v, fval] = optimizationWithDE(1, 6*size(source_tri.X,1),[],[],[], [], [], [], [], []);
+% xfinal = reshape(xfinal_v',2*size(source_tri.X,1),3) +  [source_tri.X;source_tri.X];
 
 tim = toc
 

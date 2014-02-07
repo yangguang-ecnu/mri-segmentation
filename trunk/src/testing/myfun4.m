@@ -119,8 +119,8 @@ for i = 1 : in.n
 %     J1(i,:) = [grad_s1 0] * axi_m1_par{i} * w1; % axial_m1{sub_3(i)}(1:2,:)
 %     J2(i,:) = [grad_s2 0] * sag_m1_par{i} * w1; % sag_m1{sub_2(i)}(1:2,:)
     
-    grad_ax  = [in.gradx_ax( min_max_r1ax, min_max_c1ax, sub_3(i)) -in.grady_ax( min_max_r1ax, min_max_c1ax, sub_3(i))];
-    grad_sag = [in.gradx_sag(min_max_r1sg, min_max_c1sg, sub_2(i)) -in.grady_sag(min_max_r1sg, min_max_c1sg, sub_2(i))];
+    grad_ax  = [in.gradx_ax( min_max_r1ax, min_max_c1ax, sub_3(i)) in.grady_ax( min_max_r1ax, min_max_c1ax, sub_3(i))];
+    grad_sag = [in.gradx_sag(min_max_r1sg, min_max_c1sg, sub_2(i)) in.grady_sag(min_max_r1sg, min_max_c1sg, sub_2(i))];
     
     Js(i,:) = (grad_ax * axi_m1_par{i}(1:2,1:3) * w) - (grad_sag * sag_m1_par{i}(1:2,1:3) * w2);
 end
@@ -135,17 +135,17 @@ for i = 1:in.size_source
     lapl_tri1 = tri1.X(i,:) - mean_tmp1;
     lapl_tri2 = tri2.X(i,:) - mean_tmp2;
     
-    norm_lapl_tri1 = norm( lapl_tri1 );
-    norm_lapl_tri2 = norm( lapl_tri2 );
+    norm2_lapl_tri1 = sum( lapl_tri1.^2 );
+    norm2_lapl_tri2 = sum( lapl_tri2.^2 );
     
     % TODO: bring out the tri1 - mean_tmp1
-    F(i + in.n)     = in.sqrt_lambda * norm_lapl_tri1;
-    F(i + incr_row) = in.sqrt_lambda * norm_lapl_tri2;
+    F(i + in.n)     = in.sqrt_lambda * norm2_lapl_tri1;
+    F(i + incr_row) = in.sqrt_lambda * norm2_lapl_tri2;
     
     jsi1 = (i - 1) * 3 + 1;
     jsi2 = jsi1 + incr_col;
-    Js(i + in.n    , jsi1:jsi1+2) = (in.sqrt_lambda * ( 1 / norm_lapl_tri1 ) ) .* lapl_tri1; 
-    Js(i + incr_row, jsi2:jsi2+2) = (in.sqrt_lambda * ( 1 / norm_lapl_tri2 ) ) .* lapl_tri2; 
+    Js(i + in.n    , jsi1:jsi1+2) = (2 * in.sqrt_lambda).* lapl_tri1;%(in.sqrt_lambda * ( 1 / norm_lapl_tri1 ) ) .* lapl_tri1; 
+    Js(i + incr_row, jsi2:jsi2+2) = (2 * in.sqrt_lambda).* lapl_tri2;%(in.sqrt_lambda * ( 1 / norm_lapl_tri2 ) ) .* lapl_tri2; 
     
     for j = 1:length(in.list_edges{i})
         edgein1 = (in.list_edges{i}(j)-1) * 3 + 1;

@@ -93,8 +93,8 @@ end
 
 for i = 1:size(in.source_tri.X,1)
     
-    F(i + in.n) = in.sqrt_lambda*(norm( (tri1.X(i,:) - mean(tri1.X(in.list_edges{i},:))) ));
-    F(i + incr) = in.sqrt_lambda*(norm( (tri2.X(i,:) - mean(tri2.X(in.list_edges{i},:))) ));
+    F(i + in.n) = in.sqrt_lambda*(sum( (tri1.X(i,:) - mean(tri1.X(in.list_edges{i},:))).^2 ));
+    F(i + incr) = in.sqrt_lambda*(sum( (tri2.X(i,:) - mean(tri2.X(in.list_edges{i},:))).^2 ));
 end
 
 % F = out.F;
