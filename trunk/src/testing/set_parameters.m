@@ -164,7 +164,7 @@ for cor=1:size(views.coronal,3)
     Z_cor = [Z_cor z'];
     
     if cor == 1
-        N3 = cross([X_cor(1,cor) Y_cor(1,cor) Z_cor(1,cor)]-[X_cor(2,cor) Y_cor(2,cor) Z_cor(2,cor)],[X_cor(1,cor) Y_cor(1,cor) Z_cor(1,cor)]-[X_cor(3,cor) Y_cor(3,cor) Z_cor(3,cor)]);
+        N3 = cross(-[X_cor(1,cor) Y_cor(1,cor) Z_cor(1,cor)]+[X_cor(2,cor) Y_cor(2,cor) Z_cor(2,cor)],-[X_cor(1,cor) Y_cor(1,cor) Z_cor(1,cor)]+[X_cor(3,cor) Y_cor(3,cor) Z_cor(3,cor)]);
         N3 = N3./norm(N3) 
     end
     

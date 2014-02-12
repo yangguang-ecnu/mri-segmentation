@@ -94,7 +94,7 @@ options = optimset('Display','iter','MaxIter', 40);
 [xfinal_tmp fval exitflag output] = fminunc(@myfun_unc_ortho, mesh0,optimset('Jacobian','on','Display','iter'));
 
 xfinal(1:size(source_tri.X,1),:) = [xfinal_tmp(1:size(source_tri.X,1),:) source_tri.X(:,3)];
-xfinal(1+size(source_tri.X,1):2*size(source_tri.X,1),:) = [source_tri.X(:,1) xfinal_tmp(1+size(source_tri.X,1):2*size(source_tri.X,1),:)];
+xfinal(1+size(source_tri.X,1):2*size(source_tri.X,1),:)   = [source_tri.X(:,1) xfinal_tmp(1+size(source_tri.X,1):2*size(source_tri.X,1),:)];
 xfinal(1+2*size(source_tri.X,1):3*size(source_tri.X,1),:) = [ xfinal_tmp(1+2*size(source_tri.X,1):3*size(source_tri.X,1),1) source_tri.X(:,2) xfinal_tmp(1+2*size(source_tri.X,1):3*size(source_tri.X,1),2)];
 
 %% Define the initial mesh as a vector
