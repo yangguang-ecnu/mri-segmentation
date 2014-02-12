@@ -1,4 +1,4 @@
-function [x,y,z] = calculate4corners(M)
+function [x,y,z] = calculate4corners( M )
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %% Calculates the four corners of the plane determine by the matrix M
@@ -18,9 +18,9 @@ y = zeros(1,length(i)*length(j));
 z = zeros(1,length(i)*length(j));
 
 
-for k=1:length(i)
-    for l=1:length(j)
-        p = M*[j(k) i(l) 1]';
+for k=1:length(j)
+    for l=1:length(i)
+        p = M*[i(k) j(l) 1]';
         
         x((k-1)*length(j) + l) = p(1);
         y((k-1)*length(j) + l) = p(2);
@@ -36,3 +36,4 @@ P4 = [x(4) y(4) z(4)];
 x = [P3(1) P4(1) P2(1) P1(1)];  
 y = [P3(2) P4(2) P2(2) P1(2)];   
 z = [P3(3) P4(3) P2(3) P1(3)];
+
