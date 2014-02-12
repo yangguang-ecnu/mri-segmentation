@@ -24,9 +24,9 @@ P2 = [x(2) y(2) z(2)];
 P3 = [x(3) y(3) z(3)];
 P4 = [x(4) y(4) z(4)];
 
-x = [P1(1) P4(1) P2(1)];   %# [xorigin xA xB] coordinates in 3-D space
-y = [P1(2) P4(3) P2(2)];   %# [yorigin yA yB] coordinates in 3-D space
-z = [P1(3) P4(3) P2(3)];   %# [zorigin zA zB] coordinates in 3-D space
+% x = [P1(1) P4(1) P2(1)];   %# [xorigin xA xB] coordinates in 3-D space
+% y = [P1(2) P4(3) P2(2)];   %# [yorigin yA yB] coordinates in 3-D space
+% z = [P1(3) P4(3) P2(3)];   %# [zorigin zA zB] coordinates in 3-D space
 
 origin = [512 1];  %# Vertex of triangle in image space
 U = [0 511];       %# Vector from origin to point A in image space
