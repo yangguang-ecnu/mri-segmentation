@@ -26,7 +26,7 @@ if ortho
         r         = vrrotvec(cross_p, [0 0 1]');
         transform = vrrotvec2mat(r);
         
-        new_origin = transform * patient.ImagePositionPatient;
+        new_origin = transform * patient.ImagePositionPatient
 
 
     end
