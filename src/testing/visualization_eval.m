@@ -2,9 +2,9 @@
 clc;
 close all;
 
-target_tri_ax  = TriRep(source_tri.Triangulation, xfinal(1:size(source_tri.X,1),:));
-target_tri_sag = TriRep(source_tri.Triangulation, xfinal(size(source_tri.X,1)+1:2*size(source_tri.X,1),:));
-target_tri_cor = TriRep(source_tri.Triangulation, xfinal(2*size(source_tri.X,1)+1:end,:));
+target_tri_ax  = TriRep(source_tri_v.Triangulation, xfinal(1:size(source_tri_v.X,1),:));
+target_tri_sag = TriRep(source_tri_v.Triangulation, xfinal(size(source_tri_v.X,1)+1:2*size(source_tri_v.X,1),:));
+target_tri_cor = TriRep(source_tri_v.Triangulation, xfinal(2*size(source_tri_v.X,1)+1:end,:));
 
 k_ax  = 9;
 k_sag = 9;
@@ -24,12 +24,12 @@ c_cor = size(vol_cor_eval,2);
 for i = 1:size(vol_ax_eval,1)
     for j = 1:size(vol_ax_eval,2)
         
-        p_3d = axial_M{k_ax} * [j i 1]';
+        p_3d = axial_M{k_ax} * [j-1 i-1 1]';
         
-        current_tr = tsearchn(source_tri.X,source_tri.Triangulation,[p_3d(1) p_3d(2) p_3d(3)]); % calculate the tetrahedron where p_3d belongs
+        current_tr = tsearchn(source_tri_v.X,source_tri_v.Triangulation,[p_3d(1) p_3d(2) p_3d(3)]); % calculate the tetrahedron where p_3d belongs
         
         if ~isnan(current_tr)
-            c2b_coord = cartToBary(source_tri,current_tr,[p_3d(1) p_3d(2) p_3d(3)]); % get the barycentric coordinates
+            c2b_coord = cartToBary(source_tri_v,current_tr,[p_3d(1) p_3d(2) p_3d(3)]); % get the barycentric coordinates
             b2c_ncoord = baryToCart(target_tri_ax, current_tr, c2b_coord); % get the cartesian coordinates
             
             tmp_v1_ax = axial_M1{k_ax} * [b2c_ncoord 1]'; % 3D point to 2D point in the frame coordinates axial_M_1{sub_3(i)}
@@ -65,12 +65,12 @@ end
 for i = 1:size(vol_sag_eval,1)
     for j = 1:size(vol_sag_eval,2)
         
-        p_3d = sag_M{k_sag} * [j i 1]';
+        p_3d = sag_M{k_sag} * [j-1 i-1 1]';
         
-        current_tr = tsearchn(source_tri.X,source_tri.Triangulation,[p_3d(1) p_3d(2) p_3d(3)]); % calculate the tetrahedron where p_3d belongs
+        current_tr = tsearchn(source_tri_v.X,source_tri_v.Triangulation,[p_3d(1) p_3d(2) p_3d(3)]); % calculate the tetrahedron where p_3d belongs
         
         if ~isnan(current_tr)
-            c2b_coord = cartToBary(source_tri,current_tr,[p_3d(1) p_3d(2) p_3d(3)]); % get the barycentric coordinates
+            c2b_coord = cartToBary(source_tri_v,current_tr,[p_3d(1) p_3d(2) p_3d(3)]); % get the barycentric coordinates
             b2c_ncoord = baryToCart(target_tri_sag, current_tr, c2b_coord); % get the cartesian coordinates
             
             tmp_v1_sag = sag_M1{k_sag} * [b2c_ncoord 1]'; % 3D point to 2D point in the frame coordinates axial_M_1{sub_3(i)}
@@ -109,10 +109,10 @@ for i = 1:size(vol_cor_eval,1)
         
         p_3d = cor_M{k_cor} * [j i 1]';
         
-        current_tr = tsearchn(source_tri.X,source_tri.Triangulation,[p_3d(1) p_3d(2) p_3d(3)]); % calculate the tetrahedron where p_3d belongs
+        current_tr = tsearchn(source_tri_v.X,source_tri_v.Triangulation,[p_3d(1) p_3d(2) p_3d(3)]); % calculate the tetrahedron where p_3d belongs
         
         if ~isnan(current_tr)
-            c2b_coord = cartToBary(source_tri,current_tr,[p_3d(1) p_3d(2) p_3d(3)]); % get the barycentric coordinates
+            c2b_coord = cartToBary(source_tri_v,current_tr,[p_3d(1) p_3d(2) p_3d(3)]); % get the barycentric coordinates
             b2c_ncoord = baryToCart(target_tri_cor, current_tr, c2b_coord); % get the cartesian coordinates
             
             tmp_v1_cor = cor_M1{k_cor} * [b2c_ncoord 1]'; % 3D point to 2D point in the frame coordinates axial_M_1{sub_3(i)}
