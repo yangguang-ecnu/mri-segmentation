@@ -14,9 +14,9 @@ global lava_flex_cor
 
 disp('--------- Image denoising -----')
 % Image denoising %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-for i=1:size3
-    lava_flex(:,:,i) = anisodiff2D(lava_flex_n(:,:,i), 20, 1/7, 30, 1);
-end
+% for i=1:size3
+%     lava_flex(:,:,i) = anisodiff2D(lava_flex_n(:,:,i), 20, 1/7, 30, 1);
+% end
 
 disp('--------- Define each direction -----')
 lava_flex_ax  = lava_flex;
@@ -24,7 +24,7 @@ lava_flex_ax  = lava_flex;
 for k = 1:size3
     for i = 1:size1
         lava_flex_sag(k,i,:) = lava_flex(i,:,k); %size1-i+1,size2:-1:1,k
-%         lava_flex_sag(k,i,1:size2) = lava_flex(i,1:size2,k); %size1-i+1,size2:-1:1,k
+        %         lava_flex_sag(k,i,1:size2) = lava_flex(i,1:size2,k); %size1-i+1,size2:-1:1,k
     end
 end
 
@@ -113,7 +113,7 @@ disp('--------- Calculate M^(-1) and plane eq. for each slice in the third direc
 
 for cor = 1:size1
     
-%     [x,y,z] = calculate4corners_cor( lava_axM{1}, lava_axM{end}, [0 cor-1;511 cor-1]); %  [cor-1 511] , [cor-1 0] [0 cor-1;511 cor-1]
+    %     [x,y,z] = calculate4corners_cor( lava_axM{1}, lava_axM{end}, [0 cor-1;511 cor-1]); %  [cor-1 511] , [cor-1 0] [0 cor-1;511 cor-1]
     [x,y,z] = calculate4corners( lava_corM{cor} );
     
     X_cor_v = [X_cor_v x'];
@@ -202,9 +202,9 @@ for i = 1:length(slices_ax)
     Z_ax_def = [Z_ax_def Z_ax_v(:,ind)];
     %% image, M, M1
     vol_ax_eval(:,:,i) = lava_flex_ax(:,:,ind);
-    axial_M{i}  = lava_axM{ind}; 
-    axial_M1{i} = lava_axM_1{ind}; 
-
+    axial_M{i}  = lava_axM{ind};
+    axial_M1{i} = lava_axM_1{ind};
+    
 end
 
 
@@ -213,15 +213,15 @@ end
 disp('--------- Select the slices sagittal -----')
 for i = 1:length(slices_sag)
     ind = slices_sag(i);
-
+    
     X_sag_def = [X_sag_def X_sag_v(:,ind)];
     Y_sag_def = [Y_sag_def Y_sag_v(:,ind)];
     Z_sag_def = [Z_sag_def Z_sag_v(:,ind)];
     %% image, M, M1
     vol_sag_eval(:,:,i) = lava_flex_sag(:,:,ind);
-    sag_M{i}  = lava_sagM{ind}; 
-    sag_M1{i} = lava_sagM_1{ind}; 
-
+    sag_M{i}  = lava_sagM{ind};
+    sag_M1{i} = lava_sagM_1{ind};
+    
 end
 
 
@@ -230,22 +230,22 @@ end
 disp('--------- Select the slices coronal -----')
 for i = 1:length(slices_cor)
     ind = slices_cor(i);
-
+    
     X_cor_def = [X_cor_def X_cor_v(:,ind)];
     Y_cor_def = [Y_cor_def Y_cor_v(:,ind)];
     Z_cor_def = [Z_cor_def Z_cor_v(:,ind)];
     %% image, M, M1
     vol_cor_eval(:,:,i) = lava_flex_cor(:,:,ind);
-
-    cor_M{i}  = lava_corM{ind}; 
-    cor_M1{i} = lava_corM_1{ind}; 
-
+    
+    cor_M{i}  = lava_corM{ind};
+    cor_M1{i} = lava_corM_1{ind};
+    
 end
 
 
 
 %% Calculate the intersection between the different planes
-global t 
+global t
 t = 0:1/14:1;
 
 options = optimset('Display','off');
@@ -284,7 +284,7 @@ for i=1:length(ax)
         [x0,fval,exitflag,output,lambda] = linprog(normal,A,b,Aeq,beq,[],[],[],options); % use linear programming to determine one solution
         
         if exitflag ~= 1 %% means no solution
-
+            
             for k=1:length(t)
                 
                 var_cell1_v{i,j,k} = [ ]; %% the intersection points
@@ -448,7 +448,7 @@ for i=1:length(cor)
             end
         else
             [V1,nr,nre] = qlcon2vert(x0, A, b, Aeq, beq); % given the constraints and  a solution, determine the vertices, the intersection points !!
-
+            
             vd = - [V1(1,1),V1(1,2),V1(1,3)] + [V1(2,1),V1(2,2),V1(2,3)];
             
             for k=1:length(t)
@@ -470,46 +470,46 @@ for i=1:length(cor)
 end
 
 disp('--------- Create the regular grid -----')
-%% Create the grid 
+%% Create the grid
 
 n_x = 5;
 n_y = 5;
 n_z = 3;
 
-% c' {ijk} = c{ijk} + sigma * randn , sigma = deformable amplitude 
+% c' {ijk} = c{ijk} + sigma * randn , sigma = deformable amplitude
 
 X_array = [X_ax_v(:);X_sag_v(:);X_cor_v(:)];
 Y_array = [Y_ax_v(:);Y_sag_v(:);Y_cor_v(:)];
 Z_array = [Z_ax_v(:);Z_sag_v(:);Z_cor_v(:)];
 
 bb = [min(X_array(:)) max(X_array(:)); ...
-      min(Y_array(:)) max(Y_array(:)); ...
-      min(Z_array(:)) max(Z_array(:))];
+    min(Y_array(:)) max(Y_array(:)); ...
+    min(Z_array(:)) max(Z_array(:))];
 
 % Create the source control points
 
-l_x = linspace(bb(1,1),bb(1,2),nx);
-l_y = linspace(bb(2,1),bb(2,2),ny);
-l_z = linspace(bb(3,1),bb(3,2),nz);
+l_x = linspace(bb(1,1),bb(1,2),n_x);
+l_y = linspace(bb(2,1),bb(2,2),n_y);
+l_z = linspace(bb(3,1),bb(3,2),n_z);
 
 
-control_points = zeros(nx * ny * nz, 3);
+control_points = zeros(n_x * n_y * n_z, 3);
 
-for i = 1:nx
-    for j = 1:ny
+for i = 1:n_x
+    for j = 1:n_y
         
-        tmp =  1:nz;
-        s2ind =  tmp + nz*(j-1 + ny*(i-1));
+        tmp =  1:n_z;
+        s2ind =  tmp + n_z*(j-1 + n_y*(i-1));
         
-        control_points(s2ind,1) = repmat(l_x(i),nz,1);
-        control_points(s2ind,2) = repmat(l_y(j),nz,1);
+        control_points(s2ind,1) = repmat(l_x(i),n_z,1);
+        control_points(s2ind,2) = repmat(l_y(j),n_z,1);
         control_points(s2ind,3) = l_z(tmp);
         
     end
 end
 
 % Plot the source control points
-for i = 1:nx * ny * nz
+for i = 1:n_x * n_y * n_z
     plot3(control_points(i,1),control_points(i,2),control_points(i,3),'k+');hold on
 end
 
@@ -520,34 +520,34 @@ disp('--------- Calculate the source control points mesh (tetra_vhedrons) -----'
 tetra_c = [];
 
 figure;
-for i=1:nx-1
+for i=1:n_x-1
     
-    for j=1:ny-1
+    for j=1:n_y-1
         
-        for k=1:nz-1
+        for k=1:n_z-1
             
-            ind_tmp =  k + nz*(j-1 + ny*(i-1));
+            ind_tmp =  k + n_z*(j-1 + n_y*(i-1));
             
-            ind_tmp2 =  k+1 + nz*(j-1 + ny*(i-1));
-            ind_tmp3 =  k + nz*(j-1 + ny*(i));
-            ind_tmp4 =  k + nz*(j + ny*(i));
-            ind_tmp5 =  k + nz*(j + ny*(i-1));
-            ind_tmp6 =  k+1 + nz*(j + ny*(i));
-            ind_tmp7 =  k+1 + nz*(j + ny*(i-1));
-            ind_tmp8 =  k+1 + nz*(j-1 + ny*(i));
+            ind_tmp2 =  k+1 + n_z*(j-1 + n_y*(i-1));
+            ind_tmp3 =  k + n_z*(j-1 + n_y*(i));
+            ind_tmp4 =  k + n_z*(j + n_y*(i));
+            ind_tmp5 =  k + n_z*(j + n_y*(i-1));
+            ind_tmp6 =  k+1 + n_z*(j + n_y*(i));
+            ind_tmp7 =  k+1 + n_z*(j + n_y*(i-1));
+            ind_tmp8 =  k+1 + n_z*(j-1 + n_y*(i));
             
             
             tetra_c = [tetra_c;...
-                    ind_tmp  ind_tmp2 ind_tmp3 ind_tmp5;...
-                    ind_tmp2 ind_tmp3 ind_tmp5 ind_tmp7;...
-                    ind_tmp3 ind_tmp7 ind_tmp8 ind_tmp2;...
-                    ind_tmp4 ind_tmp7 ind_tmp8 ind_tmp3;...
-                    ind_tmp5 ind_tmp7 ind_tmp3 ind_tmp4;...
-                    ind_tmp6 ind_tmp7 ind_tmp8 ind_tmp4];
+                ind_tmp  ind_tmp2 ind_tmp3 ind_tmp5;...
+                ind_tmp2 ind_tmp3 ind_tmp5 ind_tmp7;...
+                ind_tmp3 ind_tmp7 ind_tmp8 ind_tmp2;...
+                ind_tmp4 ind_tmp7 ind_tmp8 ind_tmp3;...
+                ind_tmp5 ind_tmp7 ind_tmp3 ind_tmp4;...
+                ind_tmp6 ind_tmp7 ind_tmp8 ind_tmp4];
             
             % Just for the plotting
             vari = [control_points(ind_tmp,:);control_points(ind_tmp2,:);control_points(ind_tmp3,:);control_points(ind_tmp4,:);...
-                    control_points(ind_tmp5,:);control_points(ind_tmp6,:);control_points(ind_tmp7,:);control_points(ind_tmp8,:)];
+                control_points(ind_tmp5,:);control_points(ind_tmp6,:);control_points(ind_tmp7,:);control_points(ind_tmp8,:)];
             dt = DelaunayTri(vari);
             
             tetramesh(dt);hold on
@@ -577,7 +577,7 @@ deform_tri = TriRep(tetra_c, deform_points);
 figure;
 subplot(121);tetramesh(control_tri);hold on
 subplot(122);tetramesh(deform_tri);hold on
-            
+
 alpha(.1)
 axis equal
 
@@ -590,13 +590,13 @@ current_tr2 = tsearchn(control_tri.X,control_tri.Triangulation,[var_array2_v(:,1
 current_tr3 = tsearchn(control_tri.X,control_tri.Triangulation,[var_array3_v(:,1) var_array3_v(:,2) var_array3_v(:,3)]);
 
 % New data positions with respect the new computed meshes
-b1 = cartToBary(source_tri,  current_tr1,[var_array1_v(:,1) var_array1_v(:,2) var_array1_v(:,3)]); % barycentric coordinates of the points wrt source tri
+b1 = cartToBary(control_tri,  current_tr1,[var_array1_v(:,1) var_array1_v(:,2) var_array1_v(:,3)]); % barycentric coordinates of the points wrt source tri
 xc1 = baryToCart(deform_tri, current_tr1, b1); % cartesian coordinates of the points wrt target tri ( p' )
 
-b2 = cartToBary(source_tri,  current_tr2,[var_array2_v(:,1) var_array2_v(:,2) var_array2_v(:,3)]); % barycentric coordinates of the points wrt source tri
+b2 = cartToBary(control_tri,  current_tr2,[var_array2_v(:,1) var_array2_v(:,2) var_array2_v(:,3)]); % barycentric coordinates of the points wrt source tri
 xc2 = baryToCart(deform_tri, current_tr2, b2); % cartesian coordinates of the points wrt target tri ( p' )
 
-b3 = cartToBary(source_tri,  current_tr3,[var_array3_v(:,1) var_array3_v(:,2) var_array3_v(:,3)]); % barycentric coordinates of the points wrt source tri
+b3 = cartToBary(control_tri,  current_tr3,[var_array3_v(:,1) var_array3_v(:,2) var_array3_v(:,3)]); % barycentric coordinates of the points wrt source tri
 xc3 = baryToCart(deform_tri, current_tr3, b3); % cartesian coordinates of the points wrt target tri ( p' )
 
 
@@ -614,96 +614,136 @@ c_sag = size(vol_sag_eval,2);
 r_cor = size(vol_cor_eval,1);
 c_cor = size(vol_cor_eval,2);
 
-for i = 1:size(var_array1_v,1)
-    
-    [sub_tmp1 sub_tmp2 sub_tmp3] = ind2sub([size(var_cell1_v,3) size(var_cell1_v,2) size(var_cell1_v,1)],i);
-    
-    tmp_v1 = axial_M1{sub_tmp3} * [xc1(i,:) 1]'; % 3D point to 2D point in the frame coordinates
-    
-    %% Make sure the indexes are correct and use bilinear interpolation
+k_ax = 9;
+k_sag = 10;
+k_cor = 10;
 
-    fl  = floor(tmp_v1(1) + 1);
-    fl2 = floor(tmp_v1(2) + 1);
-    cl  = ceil(tmp_v1(1) + 1);
-    cl2 = ceil(tmp_v1(2) + 1);
-    
-    min_max_r  = min(max(fl2,1),r_ax);
-    min_max_r2 = min(max(cl2,1),r_ax);
-    min_max_c  = min(max(fl,1), c_ax);
-    min_max_c2 = min(max(cl,1), c_ax);
-    
-    neig = [vol_ax_eval(min_max_r, min_max_c, sub_tmp3(i))   vol_ax_eval(min_max_r, min_max_c2, sub_tmp3(i));...
-            vol_ax_eval(min_max_r2,min_max_c, sub_tmp3(i))   vol_ax_eval(min_max_r2,min_max_c2, sub_tmp3(i))];
+disp('--------- Compute the new images axial -----')
+parfor k_ax = 1:size(vol_ax_eval,3)
+    k_ax
+    for i = 1:r_ax
+        for j = 1:c_ax
             
-    new_i = min_max_r;
-    new_j = min_max_c;
-    new_k = sub_tmp3;
-
-    opt_im_ax(new_i, new_j, new_k) = bilinear_interpolation(tmp_v(1),tmp_v(2),double(neig));
-
-
-end 
-
-for i = 1:size(var_array1_v,1)
-    
-    [sub_tmp1 sub_tmp2 sub_tmp3] = ind2sub([size(var_cell1_v,3) size(var_cell1_v,2) size(var_cell1_v,1)],i);
-    
-    tmp_v1 = sag_M1{sub_tmp2} * [xc1(i,:) 1]'; % 3D point to 2D point in the frame coordinates
-    
-    %% Make sure the indexes are correct and use bilinear interpolation
-
-    fl  = floor(tmp_v1(1) + 1);
-    fl2 = floor(tmp_v1(2) + 1);
-    cl  = ceil(tmp_v1(1) + 1);
-    cl2 = ceil(tmp_v1(2) + 1);
-    
-    min_max_r  = min(max(fl2,1),r_sag);
-    min_max_r2 = min(max(cl2,1),r_sag);
-    min_max_c  = min(max(fl,1), c_sag);
-    min_max_c2 = min(max(cl,1), c_sag);
-    
-    neig = [vol_sag_eval(min_max_r, min_max_c, sub_tmp2(i))   vol_sag_eval(min_max_r, min_max_c2, sub_tmp2(i));...
-            vol_sag_eval(min_max_r2,min_max_c, sub_tmp2(i))   vol_sag_eval(min_max_r2,min_max_c2, sub_tmp2(i))];
+            p_3d = axial_M{k_ax} * [j i 1]';
             
-    new_i = min_max_r;
-    new_j = min_max_c;
-    new_k = sub_tmp2;
-
-    opt_im_sag(new_i, new_j, new_k) = bilinear_interpolation(tmp_v(1),tmp_v(2),double(neig));
-
-
-end 
-
-for i = 1:size(var_array3_v,1)
-    
-    [sub_tmp1 sub_tmp2 sub_tmp3] = ind2sub([size(var_cell3_v,3) size(var_cell3_v,2) size(var_cell3_v,1)],i);
-    
-    tmp_v1 = cor_M1{sub_tmp3} * [xc3(i,:) 1]'; % 3D point to 2D point in the frame coordinates
-    
-    %% Make sure the indexes are correct and use bilinear interpolation
-
-    fl  = floor(tmp_v1(1) + 1);
-    fl2 = floor(tmp_v1(2) + 1);
-    cl  = ceil(tmp_v1(1) + 1);
-    cl2 = ceil(tmp_v1(2) + 1);
-    
-    min_max_r  = min(max(fl2,1),r_sag);
-    min_max_r2 = min(max(cl2,1),r_sag);
-    min_max_c  = min(max(fl,1), c_sag);
-    min_max_c2 = min(max(cl,1), c_sag);
-    
-    neig = [vol_sag_eval(min_max_r, min_max_c, sub_tmp3(i))   vol_sag_eval(min_max_r, min_max_c2, sub_tmp3(i));...
-            vol_sag_eval(min_max_r2,min_max_c, sub_tmp3(i))   vol_sag_eval(min_max_r2,min_max_c2, sub_tmp3(i))];
+            current_tr = tsearchn(control_tri.X,control_tri.Triangulation,[p_3d(1) p_3d(2) p_3d(3)]); % calculate the tetrahedron where p_3d belongs
             
-    new_i = min_max_r;
-    new_j = min_max_c;
-    new_k = sub_tmp3;
+            if ~isnan(current_tr)
+                c2b_coord = cartToBary(control_tri,current_tr,[p_3d(1) p_3d(2) p_3d(3)]); % get the barycentric coordinates
+                b2c_ncoord = baryToCart(deform_tri, current_tr, c2b_coord); % get the cartesian coordinates
+                
+                tmp_v1_ax = axial_M1{k_ax} * [b2c_ncoord 1]'; % 3D point to 2D point in the frame coordinates axial_m1{sub_3(i)}
+                
+                %% Make sure the indexes are correct and use bilinear interpolation
+                
+                fl1ax = floor(tmp_v1_ax(1) + 1);
+                fl2ax = floor(tmp_v1_ax(2) + 1);
+                cl1ax = ceil(tmp_v1_ax(1)  + 1);
+                cl2ax = ceil(tmp_v1_ax(2)  + 1);
+                
+                min_max_r1ax = min(max(fl2ax,1),r_ax);
+                min_max_r2ax = min(max(cl2ax,1),r_ax);
+                min_max_c1ax = min(max(fl1ax,1),c_ax);
+                min_max_c2ax = min(max(cl1ax,1),c_ax);
+                
+                neigax = [vol_ax_eval(min_max_r1ax, min_max_c1ax, k_ax) vol_ax_eval(min_max_r1ax, min_max_c2ax, k_ax);...
+                    vol_ax_eval(min_max_r2ax, min_max_c1ax, k_ax) vol_ax_eval(min_max_r2ax, min_max_c2ax, k_ax)];
+                
+                opt_im_ax(i,j,k_ax) = bilinear_interpolation(tmp_v1_ax(2), tmp_v1_ax(1), double(neigax));
+            else
+                opt_im_ax(i,j,k_ax) = vol_ax_eval(i,j,k_ax);
+            end
+            
+        end
+    end
+end
+% figure;
+% subplot(121);imshow(vol_ax(:,:,k),   []);title('Original');
+% subplot(122);imshow(new_axial(:,:,k),[]);title('After Deformation');
 
-    opt_im_cor(new_i, new_j, new_k) = bilinear_interpolation(tmp_v(1),tmp_v(2),double(neig));
-
-
-end 
-    
+disp('--------- Compute the new images sagittal-----')
+%% Sagittal %%
+parfor k_sag = 1:size(vol_sag_eval,3)
+    k_sag
+    for i = 1:r_sag
+        for j = 1:c_sag
+            
+            p_3d = sag_M{k_sag} * [j i 1]';
+            
+            current_tr = tsearchn(control_tri.X,control_tri.Triangulation,[p_3d(1) p_3d(2) p_3d(3)]); % calculate the tetrahedron where p_3d belongs
+            
+            if ~isnan(current_tr)
+                c2b_coord = cartToBary(control_tri,current_tr,[p_3d(1) p_3d(2) p_3d(3)]); % get the barycentric coordinates
+                b2c_ncoord = baryToCart(deform_tri, current_tr, c2b_coord); % get the cartesian coordinates
+                
+                tmp_v1_sag = sag_M1{k_sag} * [b2c_ncoord 1]'; % 3D point to 2D point in the frame coordinates axial_m1{sub_3(i)}
+                
+                %% Make sure the indexes are correct and use bilinear interpolation
+                
+                fl1sag = floor(tmp_v1_sag(1) + 1);
+                fl2sag = floor(tmp_v1_sag(2) + 1);
+                cl1sag = ceil(tmp_v1_sag(1)  + 1);
+                cl2sag = ceil(tmp_v1_sag(2)  + 1);
+                
+                min_max_r1sag = min(max(fl2sag,1),r_sag);
+                min_max_r2sag = min(max(cl2sag,1),r_sag);
+                min_max_c1sag = min(max(fl1sag,1),c_sag);
+                min_max_c2sag = min(max(cl1sag,1),c_sag);
+                
+                neigsag = [vol_sag_eval(min_max_r1sag, min_max_c1sag, k_sag) vol_sag_eval(min_max_r1sag, min_max_c2sag, k_sag);...
+                    vol_sag_eval(min_max_r2sag, min_max_c1sag, k_sag) vol_sag_eval(min_max_r2sag, min_max_c2sag, k_sag)];
+                
+                opt_im_sag(i,j,k_sag) = bilinear_interpolation(tmp_v1_sag(2), tmp_v1_sag(1), double(neigsag));
+            else
+                opt_im_sag(i,j,k_sag) = vol_sag_eval(i,j,k_sag);
+            end
+            
+        end
+    end
+end
+% figure;
+% subplot(121);imshow(vol_sag(:,:,k),   []);title('Original');
+% subplot(122);imshow(new_sagittal(:,:,k),[]);title('After Deformation');
+disp('--------- Compute the new images coronal-----')
+%% Coronal %%
+parfor k_cor =1:size(vol_cor_eval,3)
+    k_cor
+    for i = 1:r_cor
+        for j = 1:c_cor
+            
+            p_3d = cor_M{k_cor} * [j i 1]';
+            
+            current_tr = tsearchn(control_tri.X,control_tri.Triangulation,[p_3d(1) p_3d(2) p_3d(3)]); % calculate the tetrahedron where p_3d belongs
+            
+            if ~isnan(current_tr)
+                c2b_coord = cartToBary(control_tri,current_tr,[p_3d(1) p_3d(2) p_3d(3)]); % get the barycentric coordinates
+                b2c_ncoord = baryToCart(deform_tri, current_tr, c2b_coord); % get the cartesian coordinates
+                
+                tmp_v1_cor = cor_M1{k_cor} * [b2c_ncoord 1]'; % 3D point to 2D point in the frame coordinates axial_m1{sub_3(i)}
+                
+                %% Make sure the indexes are correct and use bilinear interpolation
+                
+                fl1cor = floor(tmp_v1_cor(1) + 1);
+                fl2cor = floor(tmp_v1_cor(2) + 1);
+                cl1cor = ceil(tmp_v1_cor(1)  + 1);
+                cl2cor = ceil(tmp_v1_cor(2)  + 1);
+                
+                min_max_r1cor = min(max(fl2cor,1),r_cor);
+                min_max_r2cor = min(max(cl2cor,1),r_cor);
+                min_max_c1cor = min(max(fl1cor,1),c_cor);
+                min_max_c2cor = min(max(cl1cor,1),c_cor);
+                
+                neigcor = [vol_cor_eval(min_max_r1cor, min_max_c1cor, k_cor) vol_cor_eval(min_max_r1cor, min_max_c2cor, k_cor);...
+                    vol_cor_eval(min_max_r2cor, min_max_c1cor, k_cor) vol_cor_eval(min_max_r2cor, min_max_c2cor, k_cor)];
+                
+                opt_im_cor(i,j,k_cor) = bilinear_interpolation(tmp_v1_cor(2), tmp_v1_cor(1), double(neigcor));
+            else
+                opt_im_cor(i,j,k_cor) = vol_cor_eval(i,j,k_cor);
+            end
+            
+        end
+    end
+end
 figure;subplot(121);imshow( vol_ax_eval(:,:,9),[]); subplot(122);imshow( opt_im_ax(:,:,9),[]);
 figure;subplot(121);imshow(vol_sag_eval(:,:,10),[]); subplot(122);imshow(opt_im_sag(:,:,10),[]);
 figure;subplot(121);imshow(vol_cor_eval(:,:,10),[]); subplot(122);imshow(opt_im_cor(:,:,10),[]);
