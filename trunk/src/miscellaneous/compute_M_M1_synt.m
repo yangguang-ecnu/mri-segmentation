@@ -49,7 +49,7 @@ if ortho
     
     end
     if direction == 3
-        tmp_A(1:3,1) = [-1; 0;  0] .* patient.PixelSpacing(1);
+        tmp_A(1:3,1) = [ 1; 0;  0] .* patient.PixelSpacing(1);
         tmp_A(1:3,2) = [ 0; 0; -1] .* spacing;%
         tmp_A(2,3) = 1;
         
