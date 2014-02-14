@@ -37,8 +37,8 @@ axis equal
 global vol_sag_eval
 global vol_ax_eval
 global vol_cor_eval 
-
-k_sag = 9;
+figure;
+k_sag = 11;
 ss(:,:,1) = convert2u8(vol_sag_eval(:,:,k_sag));
 ss(:,:,2) = convert2u8(vol_sag_eval(:,:,k_sag));
 ss(:,:,3) = convert2u8(vol_sag_eval(:,:,k_sag));

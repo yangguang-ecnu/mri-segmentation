@@ -108,6 +108,7 @@ for ax=1:size(views.axial,3)
     Z_ax = [Z_ax z'];
      
     if ax == 1
+        origin_ax = axial_m{ax}(:,3);
         N1 = cross([X_ax(1,ax) Y_ax(1,ax) Z_ax(1,ax)]-[X_ax(2,ax) Y_ax(2,ax) Z_ax(2,ax)],[X_ax(1,ax) Y_ax(1,ax) Z_ax(1,ax)]-[X_ax(3,ax) Y_ax(3,ax) Z_ax(3,ax)]); % normal to the axial (ax)
         N1 = N1./norm(N1)
     end
@@ -134,6 +135,7 @@ for sag=1:size(views.sagittal,3)
     Z_sag = [Z_sag z'];
     
     if sag == 1
+        origin_sag = sag_m{sag}(:,3);
         N2 = cross([X_sag(1,sag) Y_sag(1,sag) Z_sag(1,sag)]-[X_sag(2,sag) Y_sag(2,sag) Z_sag(2,sag)],[X_sag(1,sag) Y_sag(1,sag) Z_sag(1,sag)]-[X_sag(3,sag) Y_sag(3,sag) Z_sag(3,sag)]);
         N2 = N2./norm(N2)
     end
@@ -164,6 +166,7 @@ for cor=1:size(views.coronal,3)
     Z_cor = [Z_cor z'];
     
     if cor == 1
+        origin_cor = cor_m{cor}(:,3);
         N3 = cross(-[X_cor(1,cor) Y_cor(1,cor) Z_cor(1,cor)]+[X_cor(2,cor) Y_cor(2,cor) Z_cor(2,cor)],-[X_cor(1,cor) Y_cor(1,cor) Z_cor(1,cor)]+[X_cor(3,cor) Y_cor(3,cor) Z_cor(3,cor)]);
         N3 = N3./norm(N3) 
     end
@@ -177,6 +180,8 @@ fill3(X_ax(:,1),Y_ax(:,1),Z_ax(:,1),'r');hold on % first axial plane
 fill3(X_ax(:,total_ax),Y_ax(:,total_ax),Z_ax(:,total_ax),'r');hold on % first axial plane
 fill3(X_sag(:,1),Y_sag(:,1),Z_sag(:,1),'b');hold on % first sagittal plane
 fill3(X_sag(:,total_sag),Y_sag(:,total_sag),Z_sag(:,total_sag),'b');hold on % second sagittal plane
+plot3(origin_sag(1),origin_sag(2),origin_sag(3),'b*');hold on
+plot3(origin_ax(1),origin_ax(2),origin_ax(3),'r*');hold on
 alpha(.2)
 
 figure;
@@ -184,6 +189,7 @@ fill3(X_ax(:,1),Y_ax(:,1),Z_ax(:,1),'r');hold on % first axial plane
 fill3(X_ax(:,total_ax),Y_ax(:,total_ax),Z_ax(:,total_ax),'r');hold on % first axial plane
 fill3(X_cor(:,1),Y_cor(:,1),Z_cor(:,1),'b');hold on % first sagittal plane
 fill3(X_cor(:,total_cor),Y_cor(:,total_cor),Z_cor(:,total_cor),'b');hold on % second sagittal plane
+plot3(origin_cor(1),origin_cor(2),origin_cor(3),'b*');hold on
 alpha(.2)
 
 figure;
