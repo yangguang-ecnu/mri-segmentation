@@ -190,8 +190,8 @@ for i = 1: n3
         
         min_max_r  = min(max(fl2,1),r_sag);
         min_max_r2 = min(max(cl2,1),r_sag);
-        min_max_c  = min(max(fl,1),c_sag);
-        min_max_c2 = min(max(cl,1),c_sag);
+        min_max_c  = min(max(fl,1), c_sag);
+        min_max_c2 = min(max(cl,1), c_sag);
         
         neig = [vol_sag_eval(min_max_r, min_max_c, sub_2_int3_v(i))   vol_sag_eval(min_max_r, min_max_c2, sub_2_int3_v(i));...
                 vol_sag_eval(min_max_r2,min_max_c, sub_2_int3_v(i))   vol_sag_eval(min_max_r2,min_max_c2, sub_2_int3_v(i))];
