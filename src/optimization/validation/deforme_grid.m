@@ -472,8 +472,8 @@ end
 disp('--------- Create the regular grid -----')
 %% Create the grid
 
-n_x = 5;
-n_y = 5;
+n_x = 3;
+n_y = 3;
 n_z = 3;
 
 % c' {ijk} = c{ijk} + sigma * randn , sigma = deformable amplitude
@@ -744,6 +744,7 @@ parfor k_cor =1:size(vol_cor_eval,3)
         end
     end
 end
+
 figure;subplot(121);imshow( vol_ax_eval(:,:,9),[]); subplot(122);imshow( opt_im_ax(:,:,9),[]);
 figure;subplot(121);imshow(vol_sag_eval(:,:,10),[]); subplot(122);imshow(opt_im_sag(:,:,10),[]);
 figure;subplot(121);imshow(vol_cor_eval(:,:,10),[]); subplot(122);imshow(opt_im_cor(:,:,10),[]);

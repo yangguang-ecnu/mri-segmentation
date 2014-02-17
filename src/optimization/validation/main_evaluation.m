@@ -18,6 +18,7 @@ global lava_flex_sag
 global lava_flex_cor
 
 disp('--------- Image denoising -----')
+% lava_flex = lava_flex_n;
 % Image denoising %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for i=1:size3
     lava_flex(:,:,i) = anisodiff2D(lava_flex_n(:,:,i), 20, 1/7, 30, 1);
@@ -36,16 +37,10 @@ end
 
 for k = 1:size3
     for j = 1:size2
-        lava_flex_cor(k,j,1:size1) = lava_flex(1:size1,j,k); % 1:size1 size2-j+1
+        lava_flex_cor(k,j,:) = lava_flex(:,j,k); % 1:size1 size2-j+1
     end
 end
 
-% for k = 1:size3
-%     for i = 1:size1
-%         lava_flex_sag(k,i,1:size2) = lava_flex(i,size2:-1:1,k); %size1-i+1,size2:-1:1,k
-% %         lava_flex_sag(k,i,1:size2) = lava_flex(i,1:size2,k); %size1-i+1,size2:-1:1,k
-%     end
-% end
 
 %% Apply random transform to each view, in each plane
 %% First try with rigid transforms
@@ -64,7 +59,7 @@ disp('--------- Calculate transformations -----')
 %% First compute the transformation M, from 2D image to the 3D RCS
 for i = 1:size3
     
-    [lava_axM{i},lava_axM_1{i},~] = compute_M_M1(lava_flex_info{i}, ortho, 1);
+    [lava_axM{i},lava_axM_1{i}, ~] = compute_M_M1(lava_flex_info{i}, ortho, 1);
     
 end
 
@@ -72,14 +67,14 @@ end
 for i = 1:size2
     
     tmp = lava_axM{1} * [i-1 0 1]'; % size2-i+1, [i-1 0 1] [size2-i 0 1]
-    [lava_sagM{i}, lava_sagM_1{i} ,~] = compute_M_M1_synt(lava_flex_info{1}, ortho, 2, tmp(1:3));
+    [lava_sagM{i}, lava_sagM_1{i} , ~] = compute_M_M1_synt(lava_flex_info{1}, ortho, 2, tmp(1:3));
     
 end
 
 for i = 1:size1
     
     tmp = lava_axM{1} * [0 i-1 1]'; % [0 i-1 1], [size1-1 i-1 1]
-    [lava_corM{i}, lava_corM_1{i} ,~] = compute_M_M1_synt(lava_flex_info{1}, ortho, 3, tmp(1:3));
+    [lava_corM{i}, lava_corM_1{i} , ~] = compute_M_M1_synt(lava_flex_info{1}, ortho, 3, tmp(1:3));
     
 end
 
@@ -221,7 +216,7 @@ figure;
 for i = 1:length(slices_ax)
     ind = slices_ax(i);
     %[out_plane, tr] = apply_t([X_ax_v(:,ind) Y_ax_v(:,ind) Z_ax_v(:,ind)],[7 7 0]');
-    [T1, VX_ax(:,:,i), VY_ax(:,:,i)] = solving_ad3( double(lava_flex_ax(:,:,ind)) );
+%     [T1, VX_ax(:,:,i), VY_ax(:,:,i)] = solving_ad3( double(lava_flex_ax(:,:,ind)) );
 % %     X_ax_def = [X_ax_def out_plane(:,1)];
 %     Y_ax_def = [Y_ax_def out_plane(:,2)];
 %     Z_ax_def = [Z_ax_def out_plane(:,3)];
@@ -229,8 +224,8 @@ for i = 1:length(slices_ax)
     Y_ax_def = [Y_ax_def Y_ax_v(:,ind)];
     Z_ax_def = [Z_ax_def Z_ax_v(:,ind)];
     %% image, M, M1
-%     vol_ax_eval(:,:,i) = lava_flex_ax(:,:,ind);
-    vol_ax_eval(:,:,i) = T1;
+    vol_ax_eval(:,:,i) = lava_flex_ax(:,:,ind); % opt_im_ax(:,:,i);
+%     vol_ax_eval(:,:,i) = T1;
     axial_M{i}  = lava_axM{ind}; % tr * 
     axial_M1{i} = lava_axM_1{ind}; %  / tr
 %         plot3(X_ax_v(1,ind), Y_ax_v(1,ind), Z_ax_v(1,ind),'m+');hold on
@@ -244,7 +239,7 @@ disp('--------- Apply deformations sagittal -----')
 for i = 1:length(slices_sag)
     ind = slices_sag(i);
 %     [out_plane, tr] = apply_t([X_sag_v(:,ind) Y_sag_v(:,ind) Z_sag_v(:,ind)],[0 0 0]');
-    [T1, VX_sag(:,:,i), VY_sag(:,:,i)] = solving_ad3( double(lava_flex_sag(:,:,ind)) );
+%     [T1, VX_sag(:,:,i), VY_sag(:,:,i)] = solving_ad3( double(lava_flex_sag(:,:,ind)) );
 %     X_sag_def = [X_sag_def out_plane(:,1)];
 %     Y_sag_def = [Y_sag_def out_plane(:,2)];
 %     Z_sag_def = [Z_sag_def out_plane(:,3)];
@@ -252,8 +247,8 @@ for i = 1:length(slices_sag)
     Y_sag_def = [Y_sag_def Y_sag_v(:,ind)];
     Z_sag_def = [Z_sag_def Z_sag_v(:,ind)];
     %% image, M, M1
-%     vol_sag_eval(:,:,i) = lava_flex_sag(:,:,ind);
-    vol_sag_eval(:,:,i) = T1;
+    vol_sag_eval(:,:,i) = lava_flex_sag(:,:,ind); %opt_im_sag(:,:,i);
+%     vol_sag_eval(:,:,i) = T1;
     sag_M{i}  = lava_sagM{ind}; % tr * 
     sag_M1{i} = lava_sagM_1{ind}; % / tr
 %         plot3(X_sag_v(1,ind), Y_sag_v(1,ind), Z_sag_v(1,ind),'m+');hold on
@@ -267,7 +262,7 @@ disp('--------- Apply deformations coronal -----')
 for i = 1:length(slices_cor)
     ind = slices_cor(i);
 %     [out_plane, tr] = apply_t([X_cor_v(:,ind) Y_cor_v(:,ind) Z_cor_v(:,ind)],[0 0 0]');
-    [T1, VX_cor(:,:,i), VY_cor(:,:,i)] = solving_ad3( double(lava_flex_cor(:,:,ind)) );
+%     [T1, VX_cor(:,:,i), VY_cor(:,:,i)] = solving_ad3( double(lava_flex_cor(:,:,ind)) );
     
 %     X_cor_def = [X_cor_def out_plane(:,1)];
 %     Y_cor_def = [Y_cor_def out_plane(:,2)];
@@ -276,8 +271,8 @@ for i = 1:length(slices_cor)
     Y_cor_def = [Y_cor_def Y_cor_v(:,ind)];
     Z_cor_def = [Z_cor_def Z_cor_v(:,ind)];
     %% image, M, M1
-%     vol_cor_eval(:,:,i) = lava_flex_cor(:,:,ind);
-    vol_cor_eval(:,:,i) = T1;
+    vol_cor_eval(:,:,i) = lava_flex_cor(:,:,ind); %opt_im_cor(:,:,i);
+%     vol_cor_eval(:,:,i) = T1;
     cor_M{i}  = lava_corM{ind}; % tr * 
     cor_M1{i} = lava_corM_1{ind}; %  / tr
 %         plot3(X_sag_v(1,ind), Y_sag_v(1,ind), Z_sag_v(1,ind),'m+');hold on
@@ -293,7 +288,7 @@ end
 
 %% Calculate the intersection between the different planes
 global t 
-t = 0:1/14:1;
+t = 0:1/24:1;
 
 options = optimset('Display','off');
 
@@ -520,21 +515,28 @@ disp('--------- Calculate the source control points ( # N^3 ) -----')
 %% Calculate the bounding box %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % bb = [xmin xmax;ymin ymax;zmin zmax]
-global var_array_v
+% global var_array_v
 
-var_array_v = [var_array1_v;var_array2_v;var_array3_v];
+% var_array_v = [var_array1_v;var_array2_v;var_array3_v];
+% 
+% tmp_var1 = var_array_v(:,1);
+% tmp_var2 = var_array_v(:,2);
+% tmp_var3 = var_array_v(:,3);
+% 
+% bb = [min(min(tmp_var1(tmp_var1~=-Inf)))-5 max(max(var_array_v(:,1)))+5; ...
+%       min(min(tmp_var2(tmp_var2~=-Inf)))-5 max(max(var_array_v(:,2)))+5; ...
+%       min(min(tmp_var3(tmp_var3~=-Inf)))-5 max(max(var_array_v(:,3)))+5];
+X_array = [X_ax_v(:);X_sag_v(:);X_cor_v(:)];
+Y_array = [Y_ax_v(:);Y_sag_v(:);Y_cor_v(:)];
+Z_array = [Z_ax_v(:);Z_sag_v(:);Z_cor_v(:)];
 
-tmp_var1 = var_array_v(:,1);
-tmp_var2 = var_array_v(:,2);
-tmp_var3 = var_array_v(:,3);
-
-bb = [min(min(tmp_var1(tmp_var1~=-Inf))) max(max(var_array_v(:,1))); ...
-      min(min(tmp_var2(tmp_var2~=-Inf))) max(max(var_array_v(:,2))); ...
-      min(min(tmp_var3(tmp_var3~=-Inf))) max(max(var_array_v(:,3)))];
-
+bb = [min(X_array(:))-25 max(X_array(:))+25;...
+      min(Y_array(:))-25 max(Y_array(:))+25;...
+      min(Z_array(:))-25 max(Z_array(:))+25];
+  
 % Create the source control points
-nx = 5;
-ny = 5;
+nx = 4;
+ny = 4;
 nz = 3;
 
 l_x = linspace(bb(1,1),bb(1,2),nx);
@@ -683,8 +685,6 @@ ubv = [ 20  20  20];
 lb = [];
 ub = [];
 
-opts = optimset('Jacobian','on','Display','iter','MaxIter', 20);
-
 tic
 
 preparing_eval;
@@ -693,14 +693,14 @@ tim = toc
 
 tic
 %% initialization
-mesh0 = [source_tri_v.X(:,1:2);source_tri_v.X(:,2:3);source_tri_v.X(:,1) source_tri_v.X(:,3)]; % [source_tri_v.X(:,1:2);source_tri_v.X(:,2:3)]
-
-options = optimset('Display','iter');%,'MaxIter', 40);
-[xfinal_tmp fval exitflag output] = fminunc(@myfun_unc_ortho_eval, mesh0, options);
-
-xfinal(1:size(source_tri_v.X,1),:) = [xfinal_tmp(1:size(source_tri_v.X,1),:) source_tri_v.X(:,3)];
-xfinal(1+size(source_tri_v.X,1):2*size(source_tri_v.X,1),:)   = [source_tri_v.X(:,1) xfinal_tmp(1+size(source_tri_v.X,1):2*size(source_tri_v.X,1),:)];
-xfinal(1+2*size(source_tri_v.X,1):3*size(source_tri_v.X,1),:) = [ xfinal_tmp(1+2*size(source_tri_v.X,1):3*size(source_tri_v.X,1),1) source_tri_v.X(:,2) xfinal_tmp(1+2*size(source_tri_v.X,1):3*size(source_tri_v.X,1),2)];
+% mesh0 = [source_tri_v.X(:,1:2);source_tri_v.X(:,2:3);source_tri_v.X(:,1) source_tri_v.X(:,3)]; % [source_tri_v.X(:,1:2);source_tri_v.X(:,2:3)]
+% 
+% options = optimset('Display','iter','MaxIter', 40,'Largescale','off');
+% [xfinal_tmp fval exitflag output] = fminunc(@myfun_unc_ortho_eval, mesh0, options);
+% 
+% xfinal(1:size(source_tri_v.X,1),:) = [xfinal_tmp(1:size(source_tri_v.X,1),:) source_tri_v.X(:,3)];
+% xfinal(1+size(source_tri_v.X,1):2*size(source_tri_v.X,1),:)   = [source_tri_v.X(:,1) xfinal_tmp(1+size(source_tri_v.X,1):2*size(source_tri_v.X,1),:)];
+% xfinal(1+2*size(source_tri_v.X,1):3*size(source_tri_v.X,1),:) = [ xfinal_tmp(1+2*size(source_tri_v.X,1):3*size(source_tri_v.X,1),1) source_tri_v.X(:,2) xfinal_tmp(1+2*size(source_tri_v.X,1):3*size(source_tri_v.X,1),2)];
 
 %% Define the initial mesh as a vector
 % mesh_vector_tmp = [source_tri_v.X;source_tri_v.X]';
@@ -708,5 +708,20 @@ xfinal(1+2*size(source_tri_v.X,1):3*size(source_tri_v.X,1),:) = [ xfinal_tmp(1+2
 % 
 % [xfinal_v, fval] = optimizationWithDE(1, 6*size(source_tri_v.X,1),[],[],[], [], [], [], [], []);
 % xfinal = reshape(xfinal_v',2*size(source_tri_v.X,1),3) +  [source_tri_v.X;source_tri_v.X];
+
+mesh_vector_tmp = [source_tri_v.X;source_tri_v.X;source_tri_v.X]';
+mesh_vector = mesh_vector_tmp(:);
+
+[xfinal_v, fval] = optimizationWithDE(1, 6 * size(source_tri_v.X,1),[],[],[], [], [], [], [], []);
+
+xfinal_t = reshape(xfinal_v', 3 * size(source_tri_v.X,1),2);% +  [source_tri_v.X;source_tri_v.X];
+
+xfinal(1:size(source_tri_v.X,1),:) = [xfinal_t(1:size(source_tri_v.X,1),:) zeros(size(source_tri_v.X,1),1)] + source_tri_v.X;
+xfinal(size(source_tri_v.X,1)+1:2*size(source_tri_v.X,1),:) = [zeros(size(source_tri_v.X,1),1) xfinal_t(1:size(source_tri_v.X,1),:)] + source_tri_v.X;
+xfinal(2*size(source_tri_v.X,1)+1:3*size(source_tri_v.X,1),:) = [xfinal_t(1:size(source_tri_v.X,1),1) zeros(size(source_tri_v.X,1),1) xfinal_t(1:size(source_tri_v.X,1),2)] + source_tri_v.X;
+
+target_tri = TriRep(source_tri_v.Triangulation,xfinal);
+
+plot_triangulations(source_tri_v,target_tri);
 
 tim = toc
