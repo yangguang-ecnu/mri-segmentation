@@ -70,29 +70,33 @@ c2b_coord_int3  = cartToBary(source_tri,current_tr_int3,[var_array3(:,1) var_arr
 lbv = [-20 -20 -20];
 ubv = [ 20  20  20];
 
-% lb = repmat(lbv,2*size(source_tri.X,1),1) + [source_tri.X;source_tri.X];
-% ub = repmat(ubv,2*size(source_tri.X,1),1) + [source_tri.X;source_tri.X];
-lb = [];
-ub = [];
+lb = repmat(lbv,2*size(source_tri.X,1),1) + [source_tri.X;source_tri.X];
+ub = repmat(ubv,2*size(source_tri.X,1),1) + [source_tri.X;source_tri.X];
+% lb = [];
+% ub = [];
 
 opts = optimset('Jacobian','on','Display','iter','MaxIter', 20);
 
 tic
-[in out] = preparing;
-
+% [in out] = preparing;
+preparing_eval;
+% [in out] = preparing4;
 tim = toc
 
 tic
 %% initialization
 mesh0 = [source_tri.X(:,1:2);source_tri.X(:,2:3);source_tri.X(:,1) source_tri.X(:,3)]; % [source_tri.X(:,1:2);source_tri.X(:,2:3)]
 
-% [xfinal fval exitflag output] = lsqnonlin(@(t)myfun4(t,in),[source_tri.X;source_tri.X],lb,ub,opts);
+% opt4 = optimset('Algorithm','levenberg-marquardt','Jacobian','on','DerivativeCheck','on','GradConstr','on');
+% [xfinal fval exitflag output] = lsqnonlin(@(t)myfun4(t,in),[source_tri.X;source_tri.X],lb,ub,opt4);
 % [xfinal fval exitflag output] = lsqnonlin(@(t)myfun5(t,in,out),[source_tri.X;source_tri.X],lb,ub,optimset('Display','iter','MaxIter', 40));
 % [xfinal fval exitflag output] = fminunc(@myfun_unc,[source_tri.X;source_tri.X],optimset('Display','iter','MaxIter', 40));
 % [xfinal_tmp fval exitflag output] = fminunc(@myfun_unc_ortho, mesh0, optimset('Display','iter','MaxIter', 40));
-options = optimset('Display','iter','MaxIter', 40);
-[xfinal_tmp fval exitflag output] = fminunc(@myfun_unc_ortho, mesh0,optimset('Jacobian','on','Display','iter'));
 
+% options = optimset('LargeScale','off','Jacobian','on','Display','iter','DerivativeCheck','on');
+options = optimset('Display','iter','MaxIter', 40);
+[xfinal_tmp fval exitflag output] = fminunc(@myfun_unc_ortho, mesh0,options);
+% 
 xfinal(1:size(source_tri.X,1),:) = [xfinal_tmp(1:size(source_tri.X,1),:) source_tri.X(:,3)];
 xfinal(1+size(source_tri.X,1):2*size(source_tri.X,1),:)   = [source_tri.X(:,1) xfinal_tmp(1+size(source_tri.X,1):2*size(source_tri.X,1),:)];
 xfinal(1+2*size(source_tri.X,1):3*size(source_tri.X,1),:) = [ xfinal_tmp(1+2*size(source_tri.X,1):3*size(source_tri.X,1),1) source_tri.X(:,2) xfinal_tmp(1+2*size(source_tri.X,1):3*size(source_tri.X,1),2)];

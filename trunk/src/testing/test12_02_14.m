@@ -49,7 +49,7 @@ hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
                'EdgeColor','none');hold on
 axis equal
 
-k_ax = 8;
+k_ax = 12;
 aa(:,:,1) = convert2u8(vol_ax_eval(:,:,k_ax));
 aa(:,:,2) = convert2u8(vol_ax_eval(:,:,k_ax));
 aa(:,:,3) = convert2u8(vol_ax_eval(:,:,k_ax));

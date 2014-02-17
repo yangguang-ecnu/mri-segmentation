@@ -7,7 +7,7 @@ target_tri_sag = TriRep(source_tri_v.Triangulation, xfinal(size(source_tri_v.X,1
 target_tri_cor = TriRep(source_tri_v.Triangulation, xfinal(2*size(source_tri_v.X,1)+1:end,:));
 
 k_ax  = 9;
-k_sag = 9;
+k_sag = 13;
 k_cor = 9;
 
 r_ax = size(vol_ax_eval,1);
@@ -107,7 +107,7 @@ end
 for i = 1:size(vol_cor_eval,1)
     for j = 1:size(vol_cor_eval,2)
         
-        p_3d = cor_M{k_cor} * [j i 1]';
+        p_3d = cor_M{k_cor} * [j-1 i-1 1]';
         
         current_tr = tsearchn(source_tri_v.X,source_tri_v.Triangulation,[p_3d(1) p_3d(2) p_3d(3)]); % calculate the tetrahedron where p_3d belongs
         
@@ -180,6 +180,7 @@ hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
               'EdgeColor','none');hold on
 axis equal
 % k_sag = 24;
+
 ss(:,:,2) = convert2u8(vol_sag_eval(:,:,k_sag));
 ss(:,:,1) = convert2u8(vol_sag_eval(:,:,k_sag));
 ss(:,:,3) = convert2u8(vol_sag_eval(:,:,k_sag));
@@ -225,6 +226,7 @@ hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
                'EdgeColor','none');hold on
 axis equal
 
+
 ss(:,:,2) = convert2u8(new_sagittal(:,:,k_sag));
 ss(:,:,1) = convert2u8(new_sagittal(:,:,k_sag));
 ss(:,:,3) = convert2u8(new_sagittal(:,:,k_sag));
@@ -236,8 +238,8 @@ hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
 axis equal
 
 % Deformation Axial and Coronal
-figure;
 
+figure
 aa(:,:,1) = convert2u8(new_axial(:,:,k_ax));
 aa(:,:,2) = convert2u8(new_axial(:,:,k_ax));
 aa(:,:,3) = convert2u8(new_axial(:,:,k_ax));
