@@ -36,13 +36,13 @@ for q = 1:size(mesh0_X,1)
     
 
     
-    mesh0_X_m = reshape(mesh0_X(q,:)',3 * size_sour,2);
-    %     mesh0_X_mat = mesh0_X_mat + [source_tri_v.X; source_tri_v.X];
+    mesh0_X_m = reshape(mesh0_X(q,:)',3 * size_sour,3);
+    mesh0_X_mat = mesh0_X_m + [source_tri_v.X; source_tri_v.X;source_tri_v.X];
 
     % Define the new mesh
-    mesh0_X_mat(1:size_sour,:) = [mesh0_X_m(1:size_sour,:) zeros(size_sour,1)] + source_tri_v.X;
-    mesh0_X_mat(size_sour+1:2*size_sour,:) = [zeros(size_sour,1) mesh0_X_m(size_sour+1:2*size_sour,:)] + source_tri_v.X;
-    mesh0_X_mat(2*size_sour+1:3*size_sour,:) = [mesh0_X_m(2*size_sour+1:end,1) zeros(size_sour,1) mesh0_X_m(2*size_sour+1:end,2)] + source_tri_v.X;
+%     mesh0_X_mat(1:size_sour,:) = [mesh0_X_m(1:size_sour,:) zeros(size_sour,1)] + source_tri_v.X;
+%     mesh0_X_mat(size_sour+1:2*size_sour,:) = [zeros(size_sour,1) mesh0_X_m(size_sour+1:2*size_sour,:)] + source_tri_v.X;
+%     mesh0_X_mat(2*size_sour+1:3*size_sour,:) = [mesh0_X_m(2*size_sour+1:end,1) zeros(size_sour,1) mesh0_X_m(2*size_sour+1:end,2)] + source_tri_v.X;
     
     
     tri1 = TriRep( source_tri_v.Triangulation,mesh0_X_mat(1:size_sour,:)); % define the new mesh for the axial

@@ -1,4 +1,4 @@
-function F_obj = myfun_unc_ortho_eval(mesh0_X)
+function F_obj = myfun_unc_ortho_eval2(mesh0_X)
 
 
 global source_tri_v
@@ -31,13 +31,9 @@ global sag_M1
 global cor_M1
 
 
-% tri1 = TriRep( source_tri_v.Triangulation, mesh0_X(1:size( source_tri_v.X,1),:));%source_tri_v.X(:,3)]); % define the new mesh for the axial
-% tri2 = TriRep( source_tri_v.Triangulation, mesh0_X(size( source_tri_v.X,1)+1:2 * size( source_tri_v.X,1),:)); % define the new mesh for the sagittal
-% tri3 = TriRep( source_tri_v.Triangulation, mesh0_X(2 * size( source_tri_v.X,1)+1:end,:) ); % define the new mesh for the sagittal
-
-tri1 = TriRep( source_tri_v.Triangulation,[mesh0_X(1:size( source_tri_v.X,1),:) source_tri_v.X(:,3)]); % define the new mesh for the axial
-tri2 = TriRep( source_tri_v.Triangulation,[source_tri_v.X(:,1) mesh0_X(size( source_tri_v.X,1)+1:2 * size( source_tri_v.X,1),:)]); % define the new mesh for the sagittal
-tri3 = TriRep( source_tri_v.Triangulation,[mesh0_X(2 * size( source_tri_v.X,1)+1:end,1) source_tri_v.X(:,2) mesh0_X(2 * size( source_tri_v.X,1)+1:end,2)]); % define the new mesh for the sagittal
+tri1 = TriRep( source_tri_v.Triangulation, mesh0_X(1:size( source_tri_v.X,1),:)  ); % define the new mesh for the axial
+tri2 = TriRep( source_tri_v.Triangulation, mesh0_X(size( source_tri_v.X,1)+1:2 * size( source_tri_v.X,1),:)); % define the new mesh for the sagittal
+tri3 = TriRep( source_tri_v.Triangulation, mesh0_X(2 * size( source_tri_v.X,1)+1:end,1),:); % define the new mesh for the sagittal
 
 % First intersection
 b2c_ncoord1_int1 = baryToCart(tri1,  current_tr_int1_v,  c2b_coord_int1_v);

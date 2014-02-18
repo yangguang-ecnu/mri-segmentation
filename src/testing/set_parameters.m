@@ -101,7 +101,7 @@ for ax=1:size(views.axial,3)
     
     [axial_m{ax}, axial_m1{ax}, tr_ax] = compute_M_M1(views.axial_info{ax}, ortho, 1);
     
-    [x,y,z] = calculate4corners( axial_m{ax} );
+    [x,y,z] = calculate4corners( axial_m{ax}, [0 size(views.axial,2)-1], [0 size(views.axial,1)-1] );
 
     X_ax = [X_ax x'];
     Y_ax = [Y_ax y'];
@@ -128,7 +128,7 @@ for sag=1:size(views.sagittal,3)
     
     [sag_m{sag}, sag_m1{sag}, tr_sag] = compute_M_M1(views.sagittal_info{sag}, ortho, 2);
 
-    [x,y,z] = calculate4corners( sag_m{sag} );
+    [x,y,z] = calculate4corners( sag_m{sag}, [0 size(views.sagittal,2)-1], [0 size(views.sagittal,1)-1] );
        
     X_sag = [X_sag x'];
     Y_sag = [Y_sag y'];
@@ -156,7 +156,7 @@ for cor=1:size(views.coronal,3)
     
     [cor_m{cor}, cor_m1{cor}] = compute_M_M1(views.coronal_info{cor}, ortho, 3);
     
-    [x,y,z] = calculate4corners( cor_m{cor} );
+    [x,y,z] = calculate4corners( cor_m{cor}, [0 size(views.coronal,2)-1], [0 size(views.coronal,1)-1] );
     
     %     points = [x' y' z'];
     %     fill3(points(:,1),points(:,2),points(:,3),'b');hold on
