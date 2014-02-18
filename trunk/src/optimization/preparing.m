@@ -51,6 +51,7 @@ in.cols = size(vol_ax,2);
 in.J1 = zeros(size(var_array1,1),3*size(source_tri.X,1));
 in.J2 = zeros(size(var_array1,1),3*size(source_tri.X,1));
 
+in.n = size(var_array1,1);
 in.n1 = size(var_array1,1);
 in.n2 = size(var_array2,1);
 in.n3 = size(var_array3,1);

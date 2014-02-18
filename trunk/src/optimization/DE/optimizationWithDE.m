@@ -9,7 +9,7 @@ S_struct.I_D          = n_points; % dimensionalidad ;
 S_struct.FVr_minbound = -25;
 S_struct.FVr_maxbound =  25;
 S_struct.I_bnd_constr = 1;
-S_struct.I_itermax    = 200; %200 400
+S_struct.I_itermax    = 100; %200 400
 S_struct.F_VTR        = 0; % valor muy pequenito que, de alcanzarse, se para el algoritmo
 S_struct.I_strategy   = 2; %2 = local-to-best
 if show_output > 0
