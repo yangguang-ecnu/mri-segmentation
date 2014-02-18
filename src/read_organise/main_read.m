@@ -7,7 +7,7 @@
 %%  This folder should contain the dicomdir file.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clc
-folder = 'resources/patients/LASSALAS/';%'/media/IMATION HDD/PhD_CF/backupAxis1/MRIs/ICE 2 - 2011/fibrome/';
+folder = 'resources/patients/LASSALAS/' ; %;ICE 2 - 2011/fibrome/
 
 %% Read the dicomdir and save the info in dicomdir.mat in 'folder'
 load_dicomdir(folder);
