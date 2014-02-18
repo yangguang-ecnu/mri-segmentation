@@ -18,7 +18,8 @@ dcm = dir(folder);
 
 for i=3:size(dcm,1)
         
-    filename = strcat(folder,dcm(i).name);
+    filename = strcat(folder,dcm(i).name)
+    
     im = dicomread(filename);
     info = dicominfo(filename);
     
