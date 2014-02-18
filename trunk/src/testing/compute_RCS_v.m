@@ -1,7 +1,7 @@
-function [X, Y, Z, triTexture] = compute_RCS_v( M,img)
+function [X, Y, Z, triTexture] = compute_RCS_v( M,img,i,j)
 
-i = [0 511];
-j = [0 511];
+% i = [0 511];
+% j = [0 511];
 
 x = [];
 y = [];

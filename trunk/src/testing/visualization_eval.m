@@ -7,8 +7,8 @@ target_tri_sag = TriRep(source_tri_v.Triangulation, xfinal(size(source_tri_v.X,1
 target_tri_cor = TriRep(source_tri_v.Triangulation, xfinal(2*size(source_tri_v.X,1)+1:end,:));
 
 k_ax  = 9;
-k_sag = 13;
-k_cor = 9;
+k_sag = 11;
+k_cor = 11;
 
 r_ax = size(vol_ax_eval,1);
 c_ax = size(vol_ax_eval,2);
@@ -24,7 +24,7 @@ c_cor = size(vol_cor_eval,2);
 for i = 1:size(vol_ax_eval,1)
     for j = 1:size(vol_ax_eval,2)
         
-        p_3d = axial_M{k_ax} * [j-1 i-1 1]';
+        p_3d = axial_M{k_ax} * [j i 1]';
         
         current_tr = tsearchn(source_tri_v.X,source_tri_v.Triangulation,[p_3d(1) p_3d(2) p_3d(3)]); % calculate the tetrahedron where p_3d belongs
         
@@ -65,7 +65,7 @@ end
 for i = 1:size(vol_sag_eval,1)
     for j = 1:size(vol_sag_eval,2)
         
-        p_3d = sag_M{k_sag} * [j-1 i-1 1]';
+        p_3d = sag_M{k_sag} * [j i 1]';
         
         current_tr = tsearchn(source_tri_v.X,source_tri_v.Triangulation,[p_3d(1) p_3d(2) p_3d(3)]); % calculate the tetrahedron where p_3d belongs
         
@@ -107,7 +107,7 @@ end
 for i = 1:size(vol_cor_eval,1)
     for j = 1:size(vol_cor_eval,2)
         
-        p_3d = cor_M{k_cor} * [j-1 i-1 1]';
+        p_3d = cor_M{k_cor} * [j i 1]';
         
         current_tr = tsearchn(source_tri_v.X,source_tri_v.Triangulation,[p_3d(1) p_3d(2) p_3d(3)]); % calculate the tetrahedron where p_3d belongs
         
@@ -151,7 +151,7 @@ aa(:,:,1) = convert2u8(vol_ax_eval(:,:,k_ax));
 aa(:,:,2) = convert2u8(vol_ax_eval(:,:,k_ax));
 aa(:,:,3) = convert2u8(vol_ax_eval(:,:,k_ax));
 
-[X, Y, Z, triTexture] = compute_RCS_v(axial_M{k_ax},aa);
+[X, Y, Z, triTexture] = compute_RCS_v(axial_M{k_ax},aa,[0 size1-1],[0 size2-1]);
 hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
                'FaceColor','texturemap',...
                'EdgeColor','none');hold on
@@ -161,7 +161,7 @@ ss(:,:,2) = convert2u8(vol_sag_eval(:,:,k_sag));
 ss(:,:,1) = convert2u8(vol_sag_eval(:,:,k_sag));
 ss(:,:,3) = convert2u8(vol_sag_eval(:,:,k_sag));
 
-[X, Y, Z, triTexture] = compute_RCS_v(sag_M{k_sag},ss);
+[X, Y, Z, triTexture] = compute_RCS_v(sag_M{k_sag},ss,[0 size3-1],[0 size1-1]);
 hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
               'FaceColor','texturemap',...
               'EdgeColor','none');hold on
@@ -174,7 +174,7 @@ cc(:,:,2) = convert2u8(vol_cor_eval(:,:,k_cor));
 cc(:,:,1) = convert2u8(vol_cor_eval(:,:,k_cor));
 cc(:,:,3) = convert2u8(vol_cor_eval(:,:,k_cor));
 
-[X, Y, Z, triTexture] = compute_RCS_v(cor_M{k_cor},cc);
+[X, Y, Z, triTexture] = compute_RCS_v(cor_M{k_cor},cc, [0 size3-1],[0 size2-1]);
 hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
               'FaceColor','texturemap',...
               'EdgeColor','none');hold on
@@ -185,7 +185,7 @@ ss(:,:,2) = convert2u8(vol_sag_eval(:,:,k_sag));
 ss(:,:,1) = convert2u8(vol_sag_eval(:,:,k_sag));
 ss(:,:,3) = convert2u8(vol_sag_eval(:,:,k_sag));
 
-[X, Y, Z, triTexture] = compute_RCS_v(sag_M{k_sag},ss);
+[X, Y, Z, triTexture] = compute_RCS_v(sag_M{k_sag},ss,[0 size3-1],[0 size1-1]);
 hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
               'FaceColor','texturemap',...
               'EdgeColor','none');hold on
@@ -197,7 +197,7 @@ aa(:,:,1) = convert2u8(vol_ax_eval(:,:,k_ax));
 aa(:,:,2) = convert2u8(vol_ax_eval(:,:,k_ax));
 aa(:,:,3) = convert2u8(vol_ax_eval(:,:,k_ax));
 
-[X, Y, Z, triTexture] = compute_RCS_v(axial_M{k_ax},aa);
+[X, Y, Z, triTexture] = compute_RCS_v(axial_M{k_ax},aa,[0 size1-1],[0 size2-1]);
 hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
                'FaceColor','texturemap',...
                'EdgeColor','none');hold on
@@ -207,7 +207,7 @@ cc(:,:,2) = convert2u8(vol_cor_eval(:,:,k_cor));
 cc(:,:,1) = convert2u8(vol_cor_eval(:,:,k_cor));
 cc(:,:,3) = convert2u8(vol_cor_eval(:,:,k_cor));
 
-[X, Y, Z, triTexture] = compute_RCS_v(cor_M{k_cor},cc);
+[X, Y, Z, triTexture] = compute_RCS_v(cor_M{k_cor},cc, [0 size3-1],[0 size2-1]);
 hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
               'FaceColor','texturemap',...
               'EdgeColor','none');hold on
@@ -220,7 +220,7 @@ aa(:,:,1) = convert2u8(new_axial(:,:,k_ax));
 aa(:,:,2) = convert2u8(new_axial(:,:,k_ax));
 aa(:,:,3) = convert2u8(new_axial(:,:,k_ax));
 
-[X, Y, Z, triTexture] = compute_RCS_v(axial_M{k_ax},aa);
+[X, Y, Z, triTexture] = compute_RCS_v(axial_M{k_ax},aa,[0 size1-1],[0 size2-1]);
 hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
                'FaceColor','texturemap',...
                'EdgeColor','none');hold on
@@ -231,7 +231,7 @@ ss(:,:,2) = convert2u8(new_sagittal(:,:,k_sag));
 ss(:,:,1) = convert2u8(new_sagittal(:,:,k_sag));
 ss(:,:,3) = convert2u8(new_sagittal(:,:,k_sag));
 
-[X, Y, Z, triTexture] = compute_RCS_v(sag_M{k_sag},ss);
+[X, Y, Z, triTexture] = compute_RCS_v(sag_M{k_sag},ss,[0 size3-1],[0 size1-1]);
 hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
               'FaceColor','texturemap',...
               'EdgeColor','none');hold on
@@ -244,7 +244,7 @@ aa(:,:,1) = convert2u8(new_axial(:,:,k_ax));
 aa(:,:,2) = convert2u8(new_axial(:,:,k_ax));
 aa(:,:,3) = convert2u8(new_axial(:,:,k_ax));
 
-[X, Y, Z, triTexture] = compute_RCS_v(axial_M{k_ax},aa);
+[X, Y, Z, triTexture] = compute_RCS_v(axial_M{k_ax},aa,[0 size1-1],[0 size2-1]);
 hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
                'FaceColor','texturemap',...
                'EdgeColor','none');hold on
@@ -254,7 +254,7 @@ cc(:,:,2) = convert2u8(new_coronal(:,:,k_cor));
 cc(:,:,1) = convert2u8(new_coronal(:,:,k_cor));
 cc(:,:,3) = convert2u8(new_coronal(:,:,k_cor));
 
-[X, Y, Z, triTexture] = compute_RCS_v(cor_M{k_cor},cc);
+[X, Y, Z, triTexture] = compute_RCS_v(cor_M{k_cor},cc, [0 size3-1],[0 size2-1]);
 hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
               'FaceColor','texturemap',...
               'EdgeColor','none');hold on
@@ -267,7 +267,7 @@ cc(:,:,2) = convert2u8(new_coronal(:,:,k_cor));
 cc(:,:,1) = convert2u8(new_coronal(:,:,k_cor));
 cc(:,:,3) = convert2u8(new_coronal(:,:,k_cor));
 
-[X, Y, Z, triTexture] = compute_RCS_v(cor_M{k_cor},cc);
+[X, Y, Z, triTexture] = compute_RCS_v(cor_M{k_cor},cc, [0 size3-1],[0 size2-1]);
 hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
               'FaceColor','texturemap',...
               'EdgeColor','none');hold on
@@ -278,7 +278,7 @@ ss(:,:,2) = convert2u8(new_sagittal(:,:,k_sag));
 ss(:,:,1) = convert2u8(new_sagittal(:,:,k_sag));
 ss(:,:,3) = convert2u8(new_sagittal(:,:,k_sag));
 
-[X, Y, Z, triTexture] = compute_RCS_v(sag_M{k_sag},ss);
+[X, Y, Z, triTexture] = compute_RCS_v(sag_M{k_sag},ss,[0 size3-1],[0 size1-1]);
 hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
               'FaceColor','texturemap',...
               'EdgeColor','none');hold on
