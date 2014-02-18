@@ -1,4 +1,4 @@
-function [x,y,z] = calculate4corners( M )
+function [x,y,z] = calculate4corners( M, i , j )
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %% Calculates the four corners of the plane determine by the matrix M
@@ -10,8 +10,8 @@ function [x,y,z] = calculate4corners( M )
 %%          3. z -> array of z coordinates of the four points
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-i = [0 511];
-j = [0 511];
+% i = [0 511];
+% j = [0 511];
 
 x = zeros(1,length(i)*length(j));
 y = zeros(1,length(i)*length(j));
