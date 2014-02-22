@@ -472,8 +472,8 @@ end
 disp('--------- Create the regular grid -----')
 %% Create the grid
 
-n_x = 3;
-n_y = 3;
+n_x = 4;
+n_y = 4;
 n_z = 3;
 
 % c' {ijk} = c{ijk} + sigma * randn , sigma = deformable amplitude
