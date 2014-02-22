@@ -1,3 +1,4 @@
+function main_evaluation(save_name,load_name,dcmdir)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %% Read the LAVA-Flex in the 3 directions
@@ -5,10 +6,11 @@
 %% to each one
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clc
+
 serie = 7;
 
-save_name = 'deformation_0.mat';
+ % = 'deformation_52.mat';
+load(load_name);
 
 lava_flex_n      = cellimages2mat(dcmdir.dcmPatient.Study.Series(serie,1).Images);
 lava_flex_info = dcmdir.dcmPatient.Study.Series(serie,1).ImagesInfo;
@@ -98,7 +100,7 @@ options = optimset('Display','off');
 
 disp('--------- Calculate M^(-1) and plane eq. for each slice in the first direction -----')
 
-figure;
+% figure;
 for ax = 1:size(lava_flex_ax,3)
     
     [x,y,z] = calculate4corners( lava_axM{ax}, [0 size2-1], [0 size1-1] );
@@ -107,8 +109,8 @@ for ax = 1:size(lava_flex_ax,3)
     Y_ax_v = [Y_ax_v y'];
     Z_ax_v = [Z_ax_v z'];
     
-    points = [x' y' z'];
-    plot3(points(:,1),points(:,2),points(:,3),'b+');hold on
+%     points = [x' y' z'];
+%     plot3(points(:,1),points(:,2),points(:,3),'b+');hold on
     
     if ax == 1
         N1 = cross([X_ax_v(1,ax) Y_ax_v(1,ax) Z_ax_v(1,ax)]-[X_ax_v(2,ax) Y_ax_v(2,ax) Z_ax_v(2,ax)],[X_ax_v(1,ax) Y_ax_v(1,ax) Z_ax_v(1,ax)]-[X_ax_v(3,ax) Y_ax_v(3,ax) Z_ax_v(3,ax)]); % normal to the axial (ax)
@@ -128,8 +130,8 @@ for cor = 1:size1
     Y_cor_v = [Y_cor_v y'];
     Z_cor_v = [Z_cor_v z'];
     
-    points = [x' y' z'];
-    plot3(points(:,1),points(:,2),points(:,3),'r*');hold on
+%     points = [x' y' z'];
+%     plot3(points(:,1),points(:,2),points(:,3),'r*');hold on
     
     if cor == 1
         N3 = cross([X_cor_v(1,cor) Y_cor_v(1,cor) Z_cor_v(1,cor)]-[X_cor_v(2,cor) Y_cor_v(2,cor) Z_cor_v(2,cor)],[X_cor_v(1,cor) Y_cor_v(1,cor) Z_cor_v(1,cor)]-[X_cor_v(3,cor) Y_cor_v(3,cor) Z_cor_v(3,cor)]); % normal to the axial (ax)
@@ -149,8 +151,8 @@ for sag = 1:size2
     Y_sag_v = [Y_sag_v y'];
     Z_sag_v = [Z_sag_v z'];
     
-    points = [x' y' z'];
-    plot3(points(:,1),points(:,2),points(:,3),'g*');hold on
+%     points = [x' y' z'];
+%     plot3(points(:,1),points(:,2),points(:,3),'g*');hold on
     
     if sag == 1
         N2 = cross([X_sag_v(1,sag) Y_sag_v(1,sag) Z_sag_v(1,sag)]-[X_sag_v(2,sag) Y_sag_v(2,sag) Z_sag_v(2,sag)],[X_sag_v(1,sag) Y_sag_v(1,sag) Z_sag_v(1,sag)]-[X_sag_v(3,sag) Y_sag_v(3,sag) Z_sag_v(3,sag)]); % normal to the axial (ax)
@@ -212,7 +214,7 @@ global cor_M1
 
 disp('--------- Apply deformations axial -----')
 %% Apply random deformation to the slices
-figure;
+% figure;
 % Axial
 for i = 1:length(slices_ax)
     ind = slices_ax(i);
@@ -225,7 +227,7 @@ for i = 1:length(slices_ax)
     Y_ax_def = [Y_ax_def Y_ax_v(:,ind)];
     Z_ax_def = [Z_ax_def Z_ax_v(:,ind)];
     %% image, M, M1
-    vol_ax_eval(:,:,i) = lava_flex_ax(:,:,ind); % opt_im_ax(:,:,i);%
+    vol_ax_eval(:,:,i) = opt_im_ax(:,:,i);%lava_flex_ax(:,:,ind); % 
 %     vol_ax_eval(:,:,i) = T1;
     axial_M{i}  = lava_axM{ind}; % tr * 
     axial_M1{i} = lava_axM_1{ind}; %  / tr
@@ -248,7 +250,7 @@ for i = 1:length(slices_sag)
     Y_sag_def = [Y_sag_def Y_sag_v(:,ind)];
     Z_sag_def = [Z_sag_def Z_sag_v(:,ind)];
     %% image, M, M1
-    vol_sag_eval(:,:,i) = lava_flex_sag(:,:,ind); %opt_im_sag(:,:,i);%
+    vol_sag_eval(:,:,i) = opt_im_sag(:,:,i);%lava_flex_sag(:,:,ind); %
 %     vol_sag_eval(:,:,i) = T1;
     sag_M{i}  = lava_sagM{ind}; % tr * 
     sag_M1{i} = lava_sagM_1{ind}; %  / tr
@@ -272,7 +274,7 @@ for i = 1:length(slices_cor)
     Y_cor_def = [Y_cor_def Y_cor_v(:,ind)];
     Z_cor_def = [Z_cor_def Z_cor_v(:,ind)];
     %% image, M, M1
-    vol_cor_eval(:,:,i) = lava_flex_cor(:,:,ind); %opt_im_cor(:,:,i);%
+    vol_cor_eval(:,:,i) = opt_im_cor(:,:,i);%lava_flex_cor(:,:,ind); %
 %     vol_cor_eval(:,:,i) = T1;
     cor_M{i}  =  lava_corM{ind}; % tr * 
     cor_M1{i} = lava_corM_1{ind}; %  / tr
@@ -358,7 +360,7 @@ for i=1:length(ax)
             
             for k=1:length(t)
                 
-                plot3(V1(1,1) + vd(1)*t(k),V1(1,2) + vd(2)*t(k),V1(1,3) + vd(3)*t(k),'r+');hold on;%,'MarkerSize',i);hold on
+%                 plot3(V1(1,1) + vd(1)*t(k),V1(1,2) + vd(2)*t(k),V1(1,3) + vd(3)*t(k),'r+');hold on;%,'MarkerSize',i);hold on
                 var_cell1_v{i,j,k} = [V1(1,1) + vd(1)*t(k) V1(1,2) + vd(2)*t(k) V1(1,3) + vd(3)*t(k)]; %% the intersection points
                 
                 ind_tmp = sub2ind([size(var_cell1_v,3) size(var_cell1_v,2) size(var_cell1_v,1)],k,j,i);
@@ -450,7 +452,7 @@ for i=1:length(ax)
             
             for k=1:length(t)
                 
-                plot3(V1(1,1) + vd(1)*t(k),V1(1,2) + vd(2)*t(k),V1(1,3) + vd(3)*t(k),'g+');hold on%,'MarkerSize',i);hold on
+%                 plot3(V1(1,1) + vd(1)*t(k),V1(1,2) + vd(2)*t(k),V1(1,3) + vd(3)*t(k),'g+');hold on%,'MarkerSize',i);hold on
                 var_cell2_v{i,j,k} = [V1(1,1) + vd(1)*t(k) V1(1,2) + vd(2)*t(k) V1(1,3) + vd(3)*t(k)]; %% the intersection points
                 
                 ind_tmp = sub2ind([size(var_cell2_v,3) size(var_cell2_v,2) size(var_cell2_v,1)],k,j,i);
@@ -491,10 +493,10 @@ end
 
 % figure;
 % fill3(X_ax_def(:,1),Y_ax_def(:,1),Z_ax_def(:,1),'r');hold on % first axial plane
-fill3(X_ax_def(:,i),Y_ax_def(:,i),Z_ax_def(:,i),'r');hold on % first axial plane
+% fill3(X_ax_def(:,i),Y_ax_def(:,i),Z_ax_def(:,i),'r');hold on % first axial plane
 % fill3(X_cor_def(:,1),Y_cor_def(:,1),Z_cor_def(:,1),'b');hold on % first sagittal plane
-fill3(X_cor_def(:,j),Y_cor_def(:,j),Z_cor_def(:,j),'b');hold on % second sagittal plane
-alpha(.2)
+% fill3(X_cor_def(:,j),Y_cor_def(:,j),Z_cor_def(:,j),'b');hold on % second sagittal plane
+% alpha(.2)
 disp('--------- Calculate the s2 x s3 intersections between planes of the 2 given directions -----')
 %% Intersections Axial & Sagittal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -548,7 +550,7 @@ for i=1:length(cor)
             
             for k=1:length(t)
                 
-                plot3(V1(1,1) + vd(1)*t(k),V1(1,2) + vd(2)*t(k),V1(1,3) + vd(3)*t(k),'b+'); hold on;
+%                 plot3(V1(1,1) + vd(1)*t(k),V1(1,2) + vd(2)*t(k),V1(1,3) + vd(3)*t(k),'b+'); hold on;
                 var_cell3_v{i,j,k} = [V1(1,1) + vd(1)*t(k) V1(1,2) + vd(2)*t(k) V1(1,3) + vd(3)*t(k)]; %% the intersection points
                 
                 ind_tmp = sub2ind([size(var_cell3_v,3) size(var_cell3_v,2) size(var_cell3_v,1)],k,j,i);
@@ -582,14 +584,14 @@ for i=1:length(cor)
         
     end
 end
-show_results(new_im_cor2);
-show_results(new_im_sag2);
+% show_results(new_im_cor2);
+% show_results(new_im_sag2);
 
 % figure;
 % fill3(X_sag_def(:,1),Y_sag_def(:,1),Z_sag_def(:,1),'r');hold on % first axial plane
-fill3(X_sag_def(:,j),Y_sag_def(:,j),Z_sag_def(:,j),'r');hold on % first axial plane
+% fill3(X_sag_def(:,j),Y_sag_def(:,j),Z_sag_def(:,j),'r');hold on % first axial plane
 % fill3(X_cor_def(:,1),Y_cor_def(:,1),Z_cor_def(:,1),'b');hold on % first sagittal plane
-fill3(X_cor_def(:,i),Y_cor_def(:,i),Z_cor_def(:,i),'b');hold on % second sagittal plane
+% fill3(X_cor_def(:,i),Y_cor_def(:,i),Z_cor_def(:,i),'b');hold on % second sagittal plane
 % alpha(.2)
 
 disp('--------- Calculate the source control points ( # N^3 ) -----')
@@ -604,9 +606,9 @@ tmp_var1 = var_array_v(:,1);
 tmp_var2 = var_array_v(:,2);
 tmp_var3 = var_array_v(:,3);
 
-bb = [min(min(tmp_var1(tmp_var1~=-Inf)))-5 max(max(var_array_v(:,1)))+5; ...
-      min(min(tmp_var2(tmp_var2~=-Inf)))-5 max(max(var_array_v(:,2)))+5; ...
-      min(min(tmp_var3(tmp_var3~=-Inf)))-5 max(max(var_array_v(:,3)))+5];
+bb = [min(min(tmp_var1(tmp_var1~=-Inf)))-75 max(max(var_array_v(:,1)))+75; ...
+      min(min(tmp_var2(tmp_var2~=-Inf)))-75 max(max(var_array_v(:,2)))+75; ...
+      min(min(tmp_var3(tmp_var3~=-Inf)))-75 max(max(var_array_v(:,3)))+75];
 % X_array = [X_ax_v(:);X_sag_v(:);X_cor_v(:)];
 % Y_array = [Y_ax_v(:);Y_sag_v(:);Y_cor_v(:)];
 % Z_array = [Z_ax_v(:);Z_sag_v(:);Z_cor_v(:)];
@@ -678,11 +680,11 @@ for i=1:nx-1
                     ind_tmp6 ind_tmp7 ind_tmp8 ind_tmp4];
             
             % Just for the plotting
-            vari = [source_control_v(ind_tmp,:);source_control_v(ind_tmp2,:);source_control_v(ind_tmp3,:);source_control_v(ind_tmp4,:);...
-                    source_control_v(ind_tmp5,:);source_control_v(ind_tmp6,:);source_control_v(ind_tmp7,:);source_control_v(ind_tmp8,:)];
-            dt = DelaunayTri(vari);
+%             vari = [source_control_v(ind_tmp,:);source_control_v(ind_tmp2,:);source_control_v(ind_tmp3,:);source_control_v(ind_tmp4,:);...
+%                     source_control_v(ind_tmp5,:);source_control_v(ind_tmp6,:);source_control_v(ind_tmp7,:);source_control_v(ind_tmp8,:)];
+%             dt = DelaunayTri(vari);
             
-            tetramesh(dt);hold on
+%             tetramesh(dt);hold on
             
         end
         
@@ -700,8 +702,8 @@ global list_edges_v
 trep = TriRep(tetra_v, source_control_v);
 source_tri_v = trep;
 
-alpha(.1)
-axis equal
+% alpha(.1)
+% axis equal
 
 list_edges_v = edges_connected(source_tri_v);
 
