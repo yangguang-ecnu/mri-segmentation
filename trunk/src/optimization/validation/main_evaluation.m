@@ -1,11 +1,11 @@
-function main_evaluation(save_name,load_name,dcmdir)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function main_evaluation(save_name,load_name,dcmdir,opt_im_ax, opt_im_sag, opt_im_cor)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %% Read the LAVA-Flex in the 3 directions
 %% and apply a random rigid transformation
 %% to each one
 %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 serie = 7;
 
@@ -22,11 +22,22 @@ global lava_flex_sag
 global lava_flex_cor
 
 disp('--------- Image denoising -----')
-% lava_flex = lava_flex_n;
+lava_flex = lava_flex_n;
 % Image denoising %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% for i=1:size3
+%     lava_flex(:,:,i) = anisodiff2D(lava_flex_n(:,:,i), 20, 1/7, 30, 1);
+% end
+
 for i=1:size3
-    lava_flex(:,:,i) = anisodiff2D(lava_flex_n(:,:,i), 20, 1/7, 30, 1);
+    opt_im_ax(:,:,i)  = anisodiff2D(opt_im_ax(:,:,i) , 20, 1/7, 30, 1);
 end
+for i=1:size2
+    opt_im_sag(:,:,i) = anisodiff2D(opt_im_sag(:,:,i), 20, 1/7, 30, 1);
+end
+for i=1:size1
+    opt_im_cor(:,:,i) = anisodiff2D(opt_im_cor(:,:,i), 20, 1/7, 30, 1);
+end
+
 
 disp('--------- Define each direction -----')
 lava_flex_ax  = lava_flex;
@@ -114,7 +125,7 @@ for ax = 1:size(lava_flex_ax,3)
     
     if ax == 1
         N1 = cross([X_ax_v(1,ax) Y_ax_v(1,ax) Z_ax_v(1,ax)]-[X_ax_v(2,ax) Y_ax_v(2,ax) Z_ax_v(2,ax)],[X_ax_v(1,ax) Y_ax_v(1,ax) Z_ax_v(1,ax)]-[X_ax_v(3,ax) Y_ax_v(3,ax) Z_ax_v(3,ax)]); % normal to the axial (ax)
-        N1 = N1./norm(N1)
+        N1 = N1./norm(N1);
     end
     
 end
@@ -135,7 +146,7 @@ for cor = 1:size1
     
     if cor == 1
         N3 = cross([X_cor_v(1,cor) Y_cor_v(1,cor) Z_cor_v(1,cor)]-[X_cor_v(2,cor) Y_cor_v(2,cor) Z_cor_v(2,cor)],[X_cor_v(1,cor) Y_cor_v(1,cor) Z_cor_v(1,cor)]-[X_cor_v(3,cor) Y_cor_v(3,cor) Z_cor_v(3,cor)]); % normal to the axial (ax)
-        N3 = N3./norm(N3)
+        N3 = N3./norm(N3);
     end
     
 end
@@ -156,7 +167,7 @@ for sag = 1:size2
     
     if sag == 1
         N2 = cross([X_sag_v(1,sag) Y_sag_v(1,sag) Z_sag_v(1,sag)]-[X_sag_v(2,sag) Y_sag_v(2,sag) Z_sag_v(2,sag)],[X_sag_v(1,sag) Y_sag_v(1,sag) Z_sag_v(1,sag)]-[X_sag_v(3,sag) Y_sag_v(3,sag) Z_sag_v(3,sag)]); % normal to the axial (ax)
-        N2 = N2./norm(N2)
+        N2 = N2./norm(N2);
     end
     
 end

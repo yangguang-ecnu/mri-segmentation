@@ -1,15 +1,15 @@
-function st = coordinates_M_coordinates(lava_flex_n, lava_flex, lava_flex_info)
+function st = coordinates_M_coordinates(lava_flex_n, lava_flex_info)
 
 %% Generate the deformed MRI
 
 [size1, size2, size3] = size(lava_flex_n);
 
 disp('--------- Define each direction -----')
-lava_flex_ax  = lava_flex;
+lava_flex_ax  = lava_flex_n;
 
 for k = 1:size3
     for i = 1:size1
-        lava_flex_sag(k,i,:) = lava_flex(i,:,k); %size1-i+1,size2:-1:1,k
+        lava_flex_sag(k,i,:) = lava_flex_n(i,:,k); %size1-i+1,size2:-1:1,k
         %         lava_flex_sag(k,i,1:size2) = lava_flex(i,1:size2,k); %size1-i+1,size2:-1:1,k
     end
 end
@@ -17,7 +17,7 @@ end
 
 for k = 1:size3
     for j = 1:size2
-        lava_flex_cor(k,j,1:size1) = lava_flex(1:size1,j,k); % 1:size1 size2-j+1
+        lava_flex_cor(k,j,1:size1) = lava_flex_n(1:size1,j,k); % 1:size1 size2-j+1
     end
 end
 

@@ -227,9 +227,9 @@ X_array = [st.X_ax_t(:);st.X_sag_t(:);st.X_cor_t(:)];
 Y_array = [st.Y_ax_t(:);st.Y_sag_t(:);st.Y_cor_t(:)];
 Z_array = [st.Z_ax_t(:);st.Z_sag_t(:);st.Z_cor_t(:)];
 
-bb = [min(X_array(:))-125 max(X_array(:))+125; ...
-      min(Y_array(:))-125 max(Y_array(:))+125; ...
-      min(Z_array(:))-125 max(Z_array(:))+125];
+bb = [min(X_array(:))-5 max(X_array(:))+5; ...
+      min(Y_array(:))-5 max(Y_array(:))+5; ...
+      min(Z_array(:))-5 max(Z_array(:))+5];
 
 % Create the source control points
 
@@ -254,9 +254,9 @@ for i = 1:n_x
 end
 
 % Plot the source control points
-for i = 1:n_x * n_y * n_z
-    plot3(control_points(i,1),control_points(i,2),control_points(i,3),'k+');hold on
-end
+% for i = 1:n_x * n_y * n_z
+%     plot3(control_points(i,1),control_points(i,2),control_points(i,3),'k+');hold on
+% end
 
 disp('--------- Calculate the source control points mesh (tetra_vhedrons) -----')
 %% Define the mesh for FEM %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
