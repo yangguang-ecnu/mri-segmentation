@@ -568,7 +568,7 @@ trep = TriRep(tetra_c, control_points);
 control_tri = trep;
 
 % Deformed grid
-sigma = 5; % it is the deformation amplitude
+sigma = 3; % it is the deformation amplitude
 
 deform_points_ax  = control_points(:,1:2) + sigma .* randn(size(control_points(:,1:2)));
 deform_points_sag = control_points(:,2:3) + sigma .* randn(size(control_points(:,1:2)));
@@ -578,24 +578,31 @@ deform_points_ax3  = [deform_points_ax control_tri.X(:,3)];
 deform_points_sag3 = [control_tri.X(:,1) deform_points_sag];
 deform_points_cor3 = [deform_points_cor(:,1) control_tri.X(:,2) deform_points_cor(:,2)];
 
-%% Add rotation
-rota = -0.1;
-rotb =  0.1;
-theta1 = rota + (rotb-rota)*rand(1);
-theta2 = rota + (rotb-rota)*rand(1);
-theta3 = rota + (rotb-rota)*rand(1);
-
-R = compute_rot(theta1, theta2, theta3);
+%% Add translation
+a = -10;
+b =  10;
+trans = a + (b-a).*rand(3,1);
     
 for k = 1:21
     
-    disp(['--------------- Translation ', num2str(k),'--------------------------------------'])
-    save_name = strcat('translation_',num2str(k),'.mat');
-    %% Add translation
-    a = -20;
-    b =  20;
-    trans = a + (b-a).*rand(3,1);
-        
+    disp('---------------------------------------------------------------------------------');
+    disp(['--------------- Rotation ', num2str(k),'--------------------------------------']);
+    disp('---------------------------------------------------------------------------------');
+    
+    save_name = strcat('rotation_',num2str(k),'.mat');
+    
+
+    
+    %% Add rotation
+    rad_15 = 25 * pi / 180;
+    rota = -rad_15;
+    rotb =  rad_15;
+    theta1 = rota + (rotb-rota)*rand(1);
+    theta2 = rota + (rotb-rota)*rand(1);
+    theta3 = rota + (rotb-rota)*rand(1);
+    
+    R = compute_rot(theta1, theta2, theta3);
+
     deform_points_ax32  = [R trans;0 0 0 1] * [deform_points_ax3';ones(1,size(deform_points_ax3,1))];
     deform_points_sag32 = [R trans;0 0 0 1] * [deform_points_sag3';ones(1,size(deform_points_ax3,1))];
     deform_points_cor32 = [R trans;0 0 0 1] * [deform_points_cor3';ones(1,size(deform_points_ax3,1))];
