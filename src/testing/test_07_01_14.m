@@ -94,7 +94,7 @@ mesh0 = [source_tri.X(:,1:2);source_tri.X(:,2:3);source_tri.X(:,1) source_tri.X(
 % [xfinal_tmp fval exitflag output] = fminunc(@myfun_unc_ortho, mesh0, optimset('Display','iter','MaxIter', 40));
 
 % options = optimset('LargeScale','off','Jacobian','on','Display','iter','DerivativeCheck','on');
-options = optimset('Display','iter','MaxIter', 40);
+options = optimset('Display','iter','MaxIter', 100);
 [xfinal_tmp fval exitflag output] = fminunc(@myfun_unc_ortho, mesh0,options);
 % 
 xfinal(1:size(source_tri.X,1),:) = [xfinal_tmp(1:size(source_tri.X,1),:) source_tri.X(:,3)];
