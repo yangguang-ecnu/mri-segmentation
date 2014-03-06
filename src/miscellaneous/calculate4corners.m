@@ -20,7 +20,7 @@ z = zeros(1,length(i)*length(j));
 
 for k=1:length(j)
     for l=1:length(i)
-        p = M*[i(k) j(l) 1]';
+        p = M * [j(k) i(l) 0 1]';
         
         x((k-1)*length(j) + l) = p(1);
         y((k-1)*length(j) + l) = p(2);
