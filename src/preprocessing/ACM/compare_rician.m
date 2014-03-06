@@ -30,7 +30,7 @@ sw = [1 1 1];
 for i=1:2:9
 i
 % add noise
-level=i*max(ima(:))/100;   
+level=i*max(ima(:))/100   
 rima=sqrt((ima+level*randn(s)).^2+(level*randn(s)).^2);
 
 % Method 1: Block-wise NLM3D Coupe 2008 

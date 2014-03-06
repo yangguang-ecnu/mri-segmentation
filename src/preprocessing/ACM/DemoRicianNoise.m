@@ -98,8 +98,8 @@ for i=minl:2:maxl
 i
 
 % Create noisy data with Rician noise
-level=i*max(ima(:))/100;
-rima=sqrt((ima+level*randn(s)).^2+(level*randn(s)).^2);
+level = i*max(ima(:))/100;
+rima = sqrt((ima+level*randn(s)).^2+(level*randn(s)).^2);
 
 %params
 M=3;
@@ -135,8 +135,8 @@ t4(i)=t4(i)+t2(i)+t1(i);
 % Coupe blockwise approach with parameters used in TMI 08
 % Search are of 11^3 of voxels
 tic,
-h=level;
-fima1=ornlm(rima,M+2,alpha,h);
+h = level;
+fima1 = ornlm(rima,M+2,alpha,h);
 t1(i)=toc;
 
 
