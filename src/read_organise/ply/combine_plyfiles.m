@@ -1,4 +1,4 @@
-function [faces,vertices] = combine_plyfiles(ply_ax,ply_sag,ply_cor,combine_ply)
+function [faces,vertices] = combine_plyfiles(ply_ax,ply_sag,ply_cor,combine_ply, show)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %%  Given the 3 ply files of the contours of the 3 different views 
@@ -15,6 +15,7 @@ function [faces,vertices] = combine_plyfiles(ply_ax,ply_sag,ply_cor,combine_ply)
 %%                        of the segmented organ, coronal view 
 %%           4. combine_ply(optional) -> (string) path of the ply file to save the 
 %%                                   vertex and faces information
+%%           5. show    -> if 1 shows the calculate surface, 0 (default) otherwise  
 %% Outputs:  1. faces -> Nfx3 matrix, where each row is a face and the columns
 %%                              correspond to the vertex of this face
 %%           2. vertices -> Nv x 3 matrix with rows number of contour points, 
@@ -28,48 +29,93 @@ function [faces,vertices] = combine_plyfiles(ply_ax,ply_sag,ply_cor,combine_ply)
 %% combine_plyfiles('lassalas_ax.ply','lassalas_sag.ply','lassalas_cor.ply');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 save_file = 1;
-if nargin < 4
-    save_file = 0;
+
+%% Check the number of inputs 
+if nargin == 5
+    [va,fa] = read_ply(ply_ax);
+    [vs,fs] = read_ply(ply_sag);
+    [vc,fc] = read_ply(ply_cor);
+    
+    var(:,1) = [va(:,1);vs(:,1);vc(:,1)];
+    var(:,2) = [va(:,2);vs(:,2);vc(:,2)];
+    var(:,3) = [va(:,3);vs(:,3);vc(:,3)];
 end
 
+if nargin == 4
+    [va,fa] = read_ply(ply_ax);
+    [vs,fs] = read_ply(ply_sag);
+    [vc,fc] = read_ply(ply_cor);
+    
+    var(:,1) = [va(:,1);vs(:,1);vc(:,1)];
+    var(:,2) = [va(:,2);vs(:,2);vc(:,2)];
+    var(:,3) = [va(:,3);vs(:,3);vc(:,3)];
+    show = 0;
+end
 
-[va,fa] = read_ply(ply_ax);
-[vs,fs] = read_ply(ply_sag);
-[vc,fc] = read_ply(ply_cor);
+if nargin == 3 
+    save_file = 0;
+    show = 0;
+    [va,fa] = read_ply(ply_ax);
+    [vs,fs] = read_ply(ply_sag);
+    [vc,fc] = read_ply(ply_cor);
+    
+    var(:,1) = [va(:,1);vs(:,1);vc(:,1)];
+    var(:,2) = [va(:,2);vs(:,2);vc(:,2)];
+    var(:,3) = [va(:,3);vs(:,3);vc(:,3)];
+end
 
-var(:,1) = [va(:,1);vs(:,1);vc(:,1)];
-var(:,2) = [va(:,2);vs(:,2);vc(:,2)];
-var(:,3) = [va(:,3);vs(:,3);vc(:,3)];
+if nargin == 2
+    save_file = 0;
+    show = 0;
+    [va,fa] = read_ply(ply_ax);
+    [vs,fs] = read_ply(ply_sag);
+    
+    var(:,1) = [va(:,1);vs(:,1)];
+    var(:,2) = [va(:,2);vs(:,2)];
+    var(:,3) = [va(:,3);vs(:,3)];
+end
+
+if nargin == 1
+    save_file = 0;
+    show = 0;
+    [va,fa] = read_ply(ply_ax);
+    
+    var(:,1) = va(:,1);
+    var(:,2) = va(:,2);
+    var(:,3) = va(:,3);
+end
+
 
 [t] = MyCrust(var);
 
 FV.vertices = var;
 FV.faces = t;
 
-%% plot of the output triangulation
-figure
-hold on
-%title('Output Triangulation','fontsize',14)
-axis equal
-trisurf(t,var(:,1),var(:,2),var(:,3),'facecolor','c','edgecolor','b');camlight
-%patch(FV,'FaceColor',[0 1 1],'EdgeColor','interp'); view(3); camlight
-hold on
+%% Plot of the output triangulation
+if show
+    figure
+    hold on
+    title('Output Triangulation','fontsize',14)
+    axis equal
+    subplot(121);trisurf(t,var(:,1),var(:,2),var(:,3),'facecolor','c','edgecolor','b');camlight
+    hold on
+end
 
-%% plot the smooth triangulation
+%% Plot the smooth triangulation
 
 FV2 = smoothpatch(FV,1,5);
 
 faces = FV2.faces;
 vertices = FV2.vertices;
 
-figure
-hold on
-%title('Output Smooth Triangulation','fontsize',14)
-axis equal
-trisurf(FV2.faces,FV2.vertices(:,1),FV2.vertices(:,2),FV2.vertices(:,3),'facecolor','c','edgecolor','b','edgealpha',0,'facelighting','flat');camlight
-%patch(FV2,'FaceColor',[0 1 1]); view(3); camlight %'EdgeAlpha',0
-hold on
+if show
+    title('Output Smooth Triangulation','fontsize',14)
+    axis equal
+    subplot(122);trisurf(FV2.faces,FV2.vertices(:,1),FV2.vertices(:,2),FV2.vertices(:,3),'facecolor','c','edgecolor','b','edgealpha',0,'facelighting','flat');camlight
+    hold on
+end
 
+%% Save the contours in a ply file 
 if save_file
     
     fileId = fopen(combine_ply, 'wt');
@@ -101,7 +147,7 @@ if save_file
         fprintf(fileId, '%f %f %f \n', FV2.vertices(i,1),FV2.vertices(i,2),FV2.vertices(i,3));
     end
     
-    % writing the faces
+%     % writing the faces
 %     for i = 1 : size(FV2.faces,1)
 %         fprintf(fileId, '3 %d %d %d %u %u %u\n', int32(FV2.faces(i,1)), int32(FV2.faces(i,2)), int32(FV2.faces(i,3)), 0, 255, 255);
 %     end

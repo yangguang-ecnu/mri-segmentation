@@ -1,4 +1,4 @@
-function contour2ply(mat_file,patient,ply_file)
+function contour2ply(mat_file, patient, ply_file)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %% 
@@ -11,7 +11,6 @@ vert = a.vertex;
 
 %% number of slices
 N = length(vert);
-
 
 x = [];
 y = [];
@@ -62,7 +61,9 @@ fprintf(fileId, 'end_header\n');
 % writing the vertexes
 
 for i=1:length(x)
+    
     fprintf(fileId, '%f %f %f \n', x(i), y(i),z(i));
+    
 end
 
 fclose(fileId);
