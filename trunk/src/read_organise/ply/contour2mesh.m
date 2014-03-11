@@ -1,4 +1,4 @@
-function [faces,vertices] = contour2mesh(mat_file,patient,ply_file)
+function [faces,vertices] = contour2mesh(mat_file, patient, ply_file, show)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %%  From a given set of contours (all the frames from one view) in a mat file
@@ -23,26 +23,29 @@ function [faces,vertices] = contour2mesh(mat_file,patient,ply_file)
 %%
 %% EXECUTE
 %% main_read;
-%% [faces,vertices] = contour2mesh('resources/manual_seg/LASSALAS/lassalas_uterurs_sag2.mat',...
+%% [faces, vertices] = contour2mesh('resources/manual_seg/LASSALAS/lassalas_uterurs_sag2.mat',...
 %%                         views.sagittal_info,'lassalas_sag.ply');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 save_file = 1;
+%% Check the number of inputs
+if nargin < 4
+    show      = 0;
+end
 if nargin < 3
     save_file = 0;
+    show      = 0;
 end
 
+%% Load the mat file
 a = load(mat_file);
 
 vert = a.vertex;
-
-%% number of slices
-% N = length(vert);
-% length(patient)
 
 x = [];
 y = [];
 z = [];
 
+%% Transform the contour points into the reference coordinate system (RCS)
 for i = 1:length(patient)
     
     if ~isempty(vert{i})
@@ -54,7 +57,7 @@ for i = 1:length(patient)
         M(1:3,2) = patient{i}.ImageOrientationPatient(4:6).*patient{i}.PixelSpacing(2);
         
         
-        [Vertices Lines] = contour(vert{i});
+        [Vertices, ~] = contour(vert{i});
         
         for k=1:size(Vertices,1)
             
@@ -73,22 +76,23 @@ var(:,1) = x(:)';
 var(:,2) = y(:)';
 var(:,3) = z(:)';
 
-% dt = DelaunayTri(var);
-% tetramesh(dt, 'FaceColor', 'cyan');
-
+%% Calculate the surface based on Delaunay triangulation
 [t] = MyCrust(var);
 
 faces = t;
 vertices = var;
 
-%% plot of the output triangulation
-figure(2)
-hold on
-title('Output Triangulation','fontsize',14)
-axis equal
-trisurf(t,var(:,1),var(:,2),var(:,3),'facecolor','c','edgecolor','b')%plot della superficie trattata
-hold on
+%% Plot of the output triangulation
+if show
+    figure;
+    hold on
+    title('Output Triangulation','fontsize',14)
+    axis equal
+    trisurf(t,var(:,1),var(:,2),var(:,3),'facecolor','c','edgecolor','b')%plot della superficie trattata
+    hold on
+end
 
+%% Save the contours in a ply file 
 if save_file
     
     fileId = fopen(ply_file, 'wt');

@@ -11,9 +11,10 @@ function [vertex,face] = read_ply(filename)
 %
 %   Copyright (c) 2003 Gabriel Peyr
 
-[d,c] = plyread(filename);
+[d, c] = plyread(filename,'tri');
 
-face = c;
+face   = d;
+vertex = c;
 % vi = d.face.vertex_indices;
 % nf = length(vi);
 % face = zeros(nf,3);
@@ -21,14 +22,14 @@ face = c;
 %     face(i,:) = vi{i}+1;
 % end
 
-vertex = [d.vertex.x, d.vertex.y, d.vertex.z];
+% vertex = [d.vertex.x, d.vertex.y, d.vertex.z];
 
 
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [Elements,varargout] = plyread(Path,Str)
+function [Elements, varargout] = plyread(Path,Str)
 %PLYREAD   Read a PLY 3D data file.
 %   [DATA,COMMENTS] = PLYREAD(FILENAME) reads a version 1.0 PLY file
 %   FILENAME and returns a structure DATA.  The fields in this structure
