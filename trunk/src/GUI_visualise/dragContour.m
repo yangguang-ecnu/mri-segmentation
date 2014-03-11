@@ -133,7 +133,7 @@ function pushbutton_close_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton_close (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-close all; 
+close; 
 
 % --- Executes on button press in pushbutton_ncoronal.
 function pushbutton_ncoronal_Callback(hObject, eventdata, handles)
@@ -230,7 +230,7 @@ if (get(hObject,'Value') == get(hObject,'Max'))
     
     handles.h_coronal = impoly(gca,handles.contour_coronal.vertex{handles.current_coronal});
 
-    setColor(handles.h_axial,'yellow');
+    setColor(handles.h_coronal,'yellow');
     addNewPositionCallback(handles.h_coronal, @(p) posCbc(p,handles.current_coronal));
 
     fcn = makeConstrainToRectFcn('impoly',get(gca,'XLim'),...

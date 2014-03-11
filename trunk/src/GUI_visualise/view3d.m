@@ -22,7 +22,7 @@ function varargout = view3d(varargin)
 
 % Edit the above text to modify the response to help view3d
 
-% Last Modified by GUIDE v2.5 07-Feb-2014 12:52:43
+% Last Modified by GUIDE v2.5 06-Mar-2014 12:51:09
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,9 +59,16 @@ handles.output = hObject;
 
 handles.views = varargin{1};
 handles.triangulation = [];
+
 if length(varargin) > 1
     handles.triangulation = varargin{2};
 end
+
+handles.plot_slices = 1;
+handles.plot_vol    = 1;
+%% Axis orientation 3D
+handles.az = -37.5;
+handles.el = 30;
 
 handles.vol_axial = handles.views.axial;
 handles.s_axial = size(handles.vol_axial,3); %% number of slices
@@ -154,66 +161,79 @@ axes(handles.axes_3dview);
 axis on
 cla
 
-if ~isempty(handles.triangulation)
-    %for i = 1:length(handles.triangulation)
-    i = 1;
-    trisurf(handles.triangulation(i).faces,handles.triangulation(i).vertices(:,1),handles.triangulation(i).vertices(:,2),handles.triangulation(i).vertices(:,3),'facecolor','c','edgecolor','none','facelighting','flat');camlight;hold on
-    alpha(.2)
-    i = 2;
-    trisurf(handles.triangulation(i).faces,handles.triangulation(i).vertices(:,1),handles.triangulation(i).vertices(:,2),handles.triangulation(i).vertices(:,3),'facecolor','b','edgecolor','none','facelighting','flat');camlight;hold on
+% set(cla,'CameraViewAngle',handles.camera);
 
-    %end
+%% Plot volume if it selected and it exists
+if handles.plot_vol
+    
+    if ~isempty(handles.triangulation)
+        for i = 1:length(handles.triangulation)
+
+        colors = [0 i-1 1];
+        trisurf(handles.triangulation(i).faces, handles.triangulation(i).vertices(:,1),handles.triangulation(i).vertices(:,2),handles.triangulation(i).vertices(:,3),'facecolor',colors,'edgecolor','k','facelighting','flat');hold on
+        alpha(.1*i)
+%         i = 2;
+%         trisurf(handles.triangulation(i).faces,handles.triangulation(i).vertices(:,1),handles.triangulation(i).vertices(:,2),handles.triangulation(i).vertices(:,3),'facecolor','b','edgecolor','none','facelighting','flat');camlight;hold on
+        
+        end
+        
+    end
+end
+
+if handles.plot_slices
+    %% Axial %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    ax = handles.slider_axial_val;
+    
+    aa(:,:,1) = convert2u8(handles.vol_axial(:,:,ax));
+    aa(:,:,2) = convert2u8(handles.vol_axial(:,:,ax));
+    aa(:,:,3) = convert2u8(handles.vol_axial(:,:,ax));
+    
+    [X, Y, Z, triTexture] = compute_RCS_v(handles.views.axial_info{ax},aa,[0 511], [0 511]);
+    hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
+        'FaceColor','texturemap',...
+        'EdgeColor','none');hold on
+    axis equal
+    
+    
+    %% Sagittal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    sag = handles.slider_sagittal_val;
+    
+    ss(:,:,2) = convert2u8(handles.vol_sagittal(:,:,sag));
+    ss(:,:,1) = convert2u8(handles.vol_sagittal(:,:,sag));
+    ss(:,:,3) = convert2u8(handles.vol_sagittal(:,:,sag));
+    
+    [X, Y, Z, triTexture] = compute_RCS_v(handles.views.sagittal_info{sag},ss,[0 511], [0 511]);
+    hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
+        'FaceColor','texturemap',...
+        'EdgeColor','none');hold on
+    axis equal
+    
+    
+    %% Coronal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    cor = handles.slider_coronal_val;
+    
+    cc(:,:,1) = convert2u8(handles.vol_coronal(:,:,cor));
+    cc(:,:,2) = convert2u8(handles.vol_coronal(:,:,cor));
+    cc(:,:,3) = convert2u8(handles.vol_coronal(:,:,cor));
+    
+    [X, Y, Z, triTexture] = compute_RCS_v(handles.views.coronal_info{cor},cc,[0 511], [0 511]);
+    
+    hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
+        'FaceColor','texturemap',...
+        'EdgeColor','none');hold on
     
 end
 
-
-%% Axial %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-ax = handles.slider_axial_val;
-
-aa(:,:,1) = convert2u8(handles.vol_axial(:,:,ax));
-aa(:,:,2) = convert2u8(handles.vol_axial(:,:,ax));
-aa(:,:,3) = convert2u8(handles.vol_axial(:,:,ax));
-
-[X, Y, Z, triTexture] = compute_RCS(handles.views.axial_info{ax},aa);
-hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
-               'FaceColor','texturemap',...
-               'EdgeColor','none');hold on
 axis equal
+axis off
 
 
-%% Sagittal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-sag = handles.slider_sagittal_val;
-
-ss(:,:,2) = convert2u8(handles.vol_sagittal(:,:,sag));
-ss(:,:,1) = convert2u8(handles.vol_sagittal(:,:,sag));
-ss(:,:,3) = convert2u8(handles.vol_sagittal(:,:,sag));
-
-[X, Y, Z, triTexture] = compute_RCS(handles.views.sagittal_info{sag},ss);
-hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
-              'FaceColor','texturemap',...
-              'EdgeColor','none');hold on
-axis equal
-
-
-%% Coronal %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-cor = handles.slider_coronal_val;
-
-cc(:,:,1) = convert2u8(handles.vol_coronal(:,:,cor));
-cc(:,:,2) = convert2u8(handles.vol_coronal(:,:,cor));
-cc(:,:,3) = convert2u8(handles.vol_coronal(:,:,cor));
-
-[X, Y, Z, triTexture] = compute_RCS(handles.views.coronal_info{cor},cc);
-
-hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
-               'FaceColor','texturemap',...
-               'EdgeColor','none');hold on
-
-axis equal
+view([handles.az handles.el])
 
 
 
-view(3)
+% handles.camera = get(cla,'CameraViewAngle');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -235,6 +255,7 @@ axes(handles.axes_coronal);
 imshow(handles.vol_coronal(:,:,handles.slider_coronal_val),[]);
 
 if handles.view3d == 1
+    [handles.az,handles.el] = view(handles.axes_3dview);
     pushbutton_3dviews_Callback(hObject, eventdata, handles);
 end
 
@@ -270,6 +291,7 @@ axes(handles.axes_sagittal);
 imshow(handles.vol_sagittal(:,:,handles.slider_sagittal_val),[]);
 
 if handles.view3d == 1
+    [handles.az,handles.el] = view(handles.axes_3dview);
     pushbutton_3dviews_Callback(hObject, eventdata, handles);
 end
 
@@ -305,6 +327,7 @@ axes(handles.axes_axial);
 imshow(handles.vol_axial(:,:,handles.slider_axial_val),[]);
 
 if handles.view3d == 1
+    [handles.az,handles.el] = view(handles.axes_3dview);
     pushbutton_3dviews_Callback(hObject, eventdata, handles);
 end
 
@@ -467,3 +490,43 @@ function pushbutton_close_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 close all; 
+
+
+% --- Executes on button press in radiobutton_vol.
+function radiobutton_vol_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton_vol (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton_vol
+if (get(hObject,'Value') == get(hObject,'Max'))
+	% Radio button is selected-take appropriate action
+    handles.plot_vol = 1;
+    [handles.az,handles.el] = view(handles.axes_3dview);
+    pushbutton_3dviews_Callback(hObject, eventdata, handles);
+else
+	% Radio button is not selected-take appropriate action
+    handles.plot_vol = 0;
+end
+% Update handles structure
+guidata(hObject, handles);
+
+% --- Executes on button press in radiobutton_slices.
+function radiobutton_slices_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton_slices (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton_slices
+
+if (get(hObject,'Value') == get(hObject,'Max'))
+	% Radio button is selected-take appropriate action
+    handles.plot_slices = 1;
+    [handles.az,handles.el] = view(handles.axes_3dview);
+    pushbutton_3dviews_Callback(hObject, eventdata, handles);
+else
+	% Radio button is not selected-take appropriate action
+    handles.plot_slices = 0;
+end
+% Update handles structure
+guidata(hObject, handles);
