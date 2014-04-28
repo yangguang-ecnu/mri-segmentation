@@ -15,6 +15,7 @@ function [vertex,face] = read_ply(filename)
 
 face   = d;
 vertex = c;
+
 % vi = d.face.vertex_indices;
 % nf = length(vi);
 % face = zeros(nf,3);
