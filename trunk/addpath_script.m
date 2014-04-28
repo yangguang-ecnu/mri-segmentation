@@ -9,4 +9,4 @@ addpath(genpath('pictures/'));
 addpath(genpath('src/'));
 
 %% Read the data, choose a patient from resources/patients/
-% main_read;
+% main_read; 
