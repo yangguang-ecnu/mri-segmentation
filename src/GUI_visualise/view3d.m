@@ -71,15 +71,21 @@ handles.az = -37.5;
 handles.el = 30;
 
 handles.vol_axial = handles.views.axial;
+handles.r_axial = size(handles.vol_axial,1);
+handles.c_axial = size(handles.vol_axial,2);
 handles.s_axial = size(handles.vol_axial,3); %% number of slices
 handles.slider_axial_val = 1;%% slider value
 
 
 handles.vol_sagittal = handles.views.sagittal;
+handles.r_sagittal = size(handles.vol_sagittal,1);
+handles.c_sagittal = size(handles.vol_sagittal,2);
 handles.s_sagittal = size(handles.vol_sagittal,3); %% number of slices
 handles.slider_sagittal_val = 1;%% slider value
 
 handles.vol_coronal = handles.views.coronal;
+handles.r_coronal = size(handles.vol_coronal,1);
+handles.c_coronal = size(handles.vol_coronal,2);
 handles.s_coronal = size(handles.vol_coronal,3); %% number of slices
 handles.slider_coronal_val = 1; %% slider value
 
@@ -162,18 +168,17 @@ axis on
 cla
 
 % set(cla,'CameraViewAngle',handles.camera);
-
+colors = [0 1 1];
 %% Plot volume if it selected and it exists
 if handles.plot_vol
     
     if ~isempty(handles.triangulation)
+        
         for i = 1:length(handles.triangulation)
-
-        colors = [0 i-1 1];
-        trisurf(handles.triangulation(i).faces, handles.triangulation(i).vertices(:,1),handles.triangulation(i).vertices(:,2),handles.triangulation(i).vertices(:,3),'facecolor',colors,'edgecolor','k','facelighting','flat');hold on
-        alpha(.1*i)
-%         i = 2;
-%         trisurf(handles.triangulation(i).faces,handles.triangulation(i).vertices(:,1),handles.triangulation(i).vertices(:,2),handles.triangulation(i).vertices(:,3),'facecolor','b','edgecolor','none','facelighting','flat');camlight;hold on
+               
+            colors = [i/length(handles.triangulation) 0 mod(i+1,2)]; 
+            trisurf(handles.triangulation(i).faces, handles.triangulation(i).vertices(:,1),handles.triangulation(i).vertices(:,2),handles.triangulation(i).vertices(:,3),'facecolor',colors,'edgecolor','none','facelighting','flat');hold on
+            alpha(.1*i)
         
         end
         
@@ -188,10 +193,8 @@ if handles.plot_slices
     aa(:,:,2) = convert2u8(handles.vol_axial(:,:,ax));
     aa(:,:,3) = convert2u8(handles.vol_axial(:,:,ax));
     
-    [X, Y, Z, triTexture] = compute_RCS_v(handles.views.axial_info{ax},aa,[0 511], [0 511]);
-    hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
-        'FaceColor','texturemap',...
-        'EdgeColor','none');hold on
+    [X, Y, Z, triTexture] = compute_triTexture(handles.views.axial_info{ax},aa,[0 handles.r_axial-1], [0 handles.c_axial-1]);
+    surf(X,Y,Z,triTexture,'FaceColor','texturemap','EdgeColor','none');hold on
     axis equal
     
     
@@ -203,10 +206,8 @@ if handles.plot_slices
     ss(:,:,1) = convert2u8(handles.vol_sagittal(:,:,sag));
     ss(:,:,3) = convert2u8(handles.vol_sagittal(:,:,sag));
     
-    [X, Y, Z, triTexture] = compute_RCS_v(handles.views.sagittal_info{sag},ss,[0 511], [0 511]);
-    hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
-        'FaceColor','texturemap',...
-        'EdgeColor','none');hold on
+    [X, Y, Z, triTexture] = compute_triTexture(handles.views.sagittal_info{sag},ss,[0 handles.r_sagittal-1], [0 handles.c_sagittal-1]);
+    surf(X,Y,Z,triTexture,'FaceColor','texturemap','EdgeColor','none');hold on
     axis equal
     
     
@@ -217,11 +218,9 @@ if handles.plot_slices
     cc(:,:,2) = convert2u8(handles.vol_coronal(:,:,cor));
     cc(:,:,3) = convert2u8(handles.vol_coronal(:,:,cor));
     
-    [X, Y, Z, triTexture] = compute_RCS_v(handles.views.coronal_info{cor},cc,[0 511], [0 511]);
+    [X, Y, Z, triTexture] = compute_triTexture(handles.views.coronal_info{cor},cc,[0 handles.r_coronal-1], [0 handles.r_coronal-1]);
     
-    hSurface = surf(X,Y,Z,triTexture,...          %# Plot texture-mapped surface
-        'FaceColor','texturemap',...
-        'EdgeColor','none');hold on
+    surf(X,Y,Z,triTexture,'FaceColor','texturemap','EdgeColor','none');hold on
     
 end
 

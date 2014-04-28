@@ -1,1 +1,0 @@
-function validate_deformation()
