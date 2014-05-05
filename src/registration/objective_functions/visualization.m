@@ -1,7 +1,10 @@
 function visualization( views, slices )
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
+%%  Visualisation of the registration results with the original images,
+%%  and using the view3d GUI
 %%
+%%  
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -47,6 +50,7 @@ ss(:,:,3) = convert2u8(new_sagittal(:,:,slices(2)));
 surf(X,Y,Z,triTexture,'FaceColor','texturemap','EdgeColor','none');
 hold on
 axis equal
+axis off; grid off
 
 % Deformation Axial and Coronal
 subplot(132);
@@ -68,6 +72,7 @@ cc(:,:,3) = convert2u8(new_coronal(:,:,slices(3)));
 surf(X,Y,Z,triTexture,'FaceColor','texturemap','EdgeColor','none');
 hold on
 axis equal
+axis off; grid off
 
 % Deformation Sagittal and Coronal
 subplot(133);
@@ -90,6 +95,7 @@ ss(:,:,3) = convert2u8(new_sagittal(:,:,slices(2)));
 surf(X,Y,Z,triTexture,'FaceColor','texturemap','EdgeColor','none');
 hold on
 axis equal
+axis off; grid off
 
 %% Visualize Original %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Original Axial and Sagittal
@@ -112,6 +118,7 @@ ss(:,:,3) = convert2u8(vol_sag(:,:,slices(2)));
 surf(X,Y,Z,triTexture,'FaceColor','texturemap','EdgeColor','none');
 hold on
 axis equal
+axis off; grid off
 
 
 % Original Coronal and Sagittal
