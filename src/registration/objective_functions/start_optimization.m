@@ -8,14 +8,13 @@ function start_optimization(  )
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global optimizer
+global t_reg
 
 global target_tri_ax
 global target_tri_sag
 global target_tri_cor
 
 global source_tri
-
-disp('--------- Start Optimization  -----')
 
 if optimizer.metaheuristic
     
@@ -25,7 +24,7 @@ if optimizer.metaheuristic
         %% Call the optimization function
         tic
         [xfinal_v, fval] = optimizationWithDE(1, 6*size(source_tri.X,1),[],[],[], [], [], [], [], [], name_func);
-        t = toc
+        t_reg = toc
         
         xfinal = reshape(xfinal_v', 2*size(source_tri.X,1),3) +  [source_tri.X;source_tri.X];
         
@@ -41,7 +40,7 @@ if optimizer.metaheuristic
         %% Call the optimization function
         tic
         [xfinal, fval] = optimizationWithDE(1, 6*size(source_tri.X,1),[],[],[], [], [], [], [], [], name_func);
-        t = toc
+        t_reg = toc
         
         mesh1 = xfinal(1:length(xfinal)/3);
         mesh2 = xfinal(length(xfinal)/3 + 1 :2 * length(xfinal)/3 );
@@ -84,7 +83,7 @@ if optimizer.steepestdescent
         %% Call the optimization function
         tic
         [xfinal, ~ , exitflag, ~] = lsqnonlin(@(t)myfun4(t,in),X0', lb', ub', opt4);
-        t = toc
+        t_reg = toc
         
         mesh1 = xfinal(1:length(X0)/2);
         mesh2 = xfinal(length(X0)/2 + 1 :end);
@@ -128,7 +127,8 @@ if optimizer.steepestdescent
         else
             [xfinal, ~ , exitflag, ~] = fmincon(@myfun_unc_orthoJ, X0, [],[],[],[], lb, ub, [], options);
         end
-        t = toc
+        t_reg = toc
+        
         exitflag
         mesh1 = xfinal(1:length(xfinal)/3);
         mesh2 = xfinal(length(xfinal)/3 + 1 :2 * length(xfinal)/3 );
