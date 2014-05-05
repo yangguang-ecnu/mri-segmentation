@@ -18,21 +18,21 @@ global var_cell1
 global var_cell2
 global var_cell3
 
-global t
+global optimizer
 
 show = 0;
 
 %% First intersection
-[diff1_a, diff_st1_a, diff_ax1_a, diff_sag1_a] = calculate_error(size(vol_ax,3), size(vol_sag,3), t, var_cell1, new_axial, new_sagittal, axial_m1, sag_m1, show);
-[diff1_b, diff_st1_b, diff_ax1_b, diff_sag1_b] = calculate_error(size(vol_ax,3), size(vol_sag,3), t, var_cell1,    vol_ax,      vol_sag, axial_m1, sag_m1, show);
+[diff1_a, diff_st1_a, diff_ax1_a, diff_sag1_a] = calculate_error(size(vol_ax,3), size(vol_sag,3), optimizer.t, var_cell1, new_axial, new_sagittal, axial_m1, sag_m1, show);
+[diff1_b, diff_st1_b, diff_ax1_b, diff_sag1_b] = calculate_error(size(vol_ax,3), size(vol_sag,3), optimizer.t, var_cell1,    vol_ax,      vol_sag, axial_m1, sag_m1, show);
 
 %% Second intersection
-[diff2_a, diff_st2_a, diff_ax2_a, diff_cor2_a] = calculate_error(size(vol_ax,3), size(vol_cor,3), t, var_cell2, new_axial, new_coronal, axial_m1, cor_m1, show);
-[diff2_b, diff_st2_b, diff_ax2_b, diff_cor2_b] = calculate_error(size(vol_ax,3), size(vol_cor,3), t, var_cell2,    vol_ax,     vol_cor, axial_m1, cor_m1, show);
+[diff2_a, diff_st2_a, diff_ax2_a, diff_cor2_a] = calculate_error(size(vol_ax,3), size(vol_cor,3), optimizer.t, var_cell2, new_axial, new_coronal, axial_m1, cor_m1, show);
+[diff2_b, diff_st2_b, diff_ax2_b, diff_cor2_b] = calculate_error(size(vol_ax,3), size(vol_cor,3), optimizer.t, var_cell2,    vol_ax,     vol_cor, axial_m1, cor_m1, show);
 
 %% Third intersection
-[diff3_a, diff_st3_a, diff_cor3_a, diff_sag3_a] = calculate_error(size(vol_cor,3), size(vol_sag,3), t, var_cell3, new_coronal, new_sagittal, cor_m1, sag_m1, show);
-[diff3_b, diff_st3_b, diff_cor3_b, diff_sag3_b] = calculate_error(size(vol_cor,3), size(vol_sag,3), t, var_cell3,     vol_cor,      vol_sag, cor_m1, sag_m1, show);
+[diff3_a, diff_st3_a, diff_cor3_a, diff_sag3_a] = calculate_error(size(vol_cor,3), size(vol_sag,3), optimizer.t, var_cell3, new_coronal, new_sagittal, cor_m1, sag_m1, show);
+[diff3_b, diff_st3_b, diff_cor3_b, diff_sag3_b] = calculate_error(size(vol_cor,3), size(vol_sag,3), optimizer.t, var_cell3,     vol_cor,      vol_sag, cor_m1, sag_m1, show);
 
 
 measure_errors.diff1_a     = diff1_a;
