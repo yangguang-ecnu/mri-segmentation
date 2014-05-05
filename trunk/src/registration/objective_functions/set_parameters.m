@@ -2,7 +2,8 @@
 
 set_up = 1;
 
-%% Axial %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+global optimizer
+
 global vol_ax
 global vol_sag
 global vol_cor
@@ -45,7 +46,7 @@ global axial_m
 global axial_m1
 
 global t
-t = 0:1/54:1;
+t = 0:1/optimizer.t:1;
 
 global ortho
 ortho = 1;
@@ -61,9 +62,11 @@ alpha = 1;
 show  = 0;
 h   = 26;
 
-[vol_ax, ~ ] = rician_noise(views.axial,    [M, alpha, h], show );
-[vol_sag, ~] = rician_noise(views.sagittal, [M, alpha, h], show );
-[vol_cor, ~] = rician_noise(views.coronal,  [M, alpha, h], show );
+if ~isempty('vol_ax')
+    [vol_ax, ~ ] = rician_noise(views.axial,    [M, alpha, h], show );
+    [vol_sag, ~] = rician_noise(views.sagittal, [M, alpha, h], show );
+    [vol_cor, ~] = rician_noise(views.coronal,  [M, alpha, h], show );
+end
 
 %% Anisotropic diffusion
 % disp('------------------------------ Anisotropic Diffusion ---------')
@@ -177,14 +180,18 @@ global var_array
 
 var_array = [var_array1;var_array2;var_array3];
 
-bb = [min(min(var_array(:,1)))-120 max(max(var_array(:,1)))+120; ...
-      min(min(var_array(:,2)))-120 max(max(var_array(:,2)))+120; ...
-      min(min(var_array(:,3)))-120 max(max(var_array(:,3)))+120];
+% bb = [min(min(var_array(:,1)))-120 max(max(var_array(:,1)))+120; ...
+%       min(min(var_array(:,2)))-120 max(max(var_array(:,2)))+120; ...
+%       min(min(var_array(:,3)))-120 max(max(var_array(:,3)))+120];
 
+bb = [min([min(X_cor(:)), min(X_sag(:)), min(X_ax(:))])-100 max([max(X_cor(:)), max(X_sag(:)), max(X_ax(:))])+100;...
+      min([min(Y_cor(:)), min(Y_sag(:)), min(Y_ax(:))])-100 max([max(Y_cor(:)), max(Y_sag(:)), max(Y_ax(:))])+100;...
+      min([min(Z_cor(:)), min(Z_sag(:)), min(Z_ax(:))])-100 max([max(Z_cor(:)), max(Z_sag(:)), max(Z_ax(:))])+100];
+  
 % Create the source control points
-nx = 4;
-ny = 4;
-nz = 4;
+nx = optimizer.nxyz(1);
+ny = optimizer.nxyz(2);
+nz = optimizer.nxyz(3);
 
 l_x = linspace(bb(1,1),bb(1,2),nx);
 l_y = linspace(bb(2,1),bb(2,2),ny);
