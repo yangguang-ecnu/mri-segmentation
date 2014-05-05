@@ -1,9 +1,19 @@
-function [var_cell, var_array] = calculate_intersections(X1, Y1, Z1, X2, Y2, Z2, t, size1, size2)
+function [var_cell, var_array, diff] = calculate_intersections(X1, Y1, Z1, X2, Y2, Z2, t, size1, size2, M1, M2)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
-%% 
+%% Calculate the intersections between two planes pi_1 and pi_2, define by the 
+%% 3D coordinates {X1, Y1, Z1} and {X2, Y2, Z2} respectively.
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+flag_diff = 0;
+diff = [];
+
+%% Check if the transformations are provided
+if nargin == 11
+    
+    flag_diff = 1;
+    
+end
 
 var_cell  = cell(size1,size2,length(t));
 var_array = zeros(size1*size2*length(t),3);
@@ -14,8 +24,8 @@ for i=1:size(X1,2)
     
     for j=1:size(X2,2)
         
-        [A1, b1, Aeq1, beq1] = vert2lcon([X1(:,i) Y1(:,i) Z1(:,i)]); %% constraints of the axial plane
-        [A2, b2, Aeq2, beq2] = vert2lcon([X2(:,j) Y2(:,j) Z2(:,j)]); %% constraints of the sagittal plane
+        [A1, b1, Aeq1, beq1] = vert2lcon([X1(:,i) Y1(:,i) Z1(:,i)]); %% constraints of the first plane
+        [A2, b2, Aeq2, beq2] = vert2lcon([X2(:,j) Y2(:,j) Z2(:,j)]); %% constraints of the second plane
         
         if i==1 && j==1
             normal = cross([X2(1,j) Y2(1,j) Z2(1,j)]-[X2(2,j) Y2(2,j) Z2(2,j)],[X2(1,j) Y2(1,j) Z2(1,j)]-[X2(3,j) Y2(3,j) Z2(3,j)]); % direction of the intersection line
@@ -46,6 +56,26 @@ for i=1:size(X1,2)
             var_array(ind_tmp,2) = V1(1,2) + vd(2)*t(k);
             var_array(ind_tmp,3) = V1(1,3) + vd(3)*t(k);
             
+            if flag_diff
+                %% First plane %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                [i1, j1, i2, j2, real_v]  = compute_coord(M1{i}, [var_cell{i,j,k} 1], size(vol_ax_eval,1), size(vol_ax_eval,2));
+                
+                neig = [vol_ax_eval(i1, j1, i)   vol_ax_eval(i1, j2, i);...
+                        vol_ax_eval(i2, j1, i)   vol_ax_eval(i2, j2, i)];
+                
+                new_im_ax(i1, j1, i) = bilinear_interpolation(real_v(2),real_v(1),double(neig));
+                diff1 = new_im_ax(i1, j1, i);
+                %% Second plane %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                [i1, j1, i2, j2, real_v]  = compute_coord(M2{j}, [var_cell{i,j,k} 1], size(vol_sag_eval,1), size(vol_sag_eval,2));
+                
+                neig = [vol_sag_eval(i1, j1, j)   vol_sag_eval(i1, j2, j);...
+                    vol_sag_eval(i2, j1, j)   vol_sag_eval(i2, j2, j)];
+                
+                new_im_sag(i1, j1, j) = bilinear_interpolation(real_v(2),real_v(1),double(neig));
+                diff2 = new_im_sag(i1, j1, j);
+                
+                diff(ind_tmp) = abs(diff1 - diff2);
+            end
         end
         
         
