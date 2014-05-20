@@ -1,10 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
-%% Main reading patient
+%% Main reading patient from a folder with DICOMDIR
 %%
-%% Execute:
-%% -change the folder path (line 10) where the patient is. 
-%%  This folder should contain the dicomdir file.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clc
 
